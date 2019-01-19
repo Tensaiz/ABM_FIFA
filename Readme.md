@@ -24,6 +24,8 @@ This project contains multiple files belonging to the model and top-level runnin
 
 ### TODO:
 
+#### Model
+
 - Add agents to scheduler
 - Run the scheduler
 - Create pools for manager teams after team assembly
