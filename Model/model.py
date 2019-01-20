@@ -20,7 +20,7 @@ class FIFA_Simulation(Model):
 
     Args:
         assemble_rounds (int): Amount of rounds it should take for all teams to form
-        years (int): Amount of years to simulate
+        seasons (int): Amount of seasons to simulate
         n_managers (int): The amount of managers to use.
         n_players (int): The amount of players to use from the FIFA dataset. 0 can be used to select all players.
         player_stats (pandas dataframe): A FIFA dataset of players with all their corresponding stats
@@ -29,22 +29,21 @@ class FIFA_Simulation(Model):
             1 = uniformly distributed
             2 = exponentially distributed
             3 = constant
-        money_distrbution_params (:obj: any): Required parameters for the money distribution used 
+        money_distrbution_params (:obj: any): Required parameters for the money distribution used
         strategies (:list:`int`): A list with the different strategies
 
     TODO:
-        - Add agents to scheduler
-        - Run the scheduler
-        - Create pools for manager teams after team assembly
+        - Implement match system where pools are created that have 18 managers and each (manager) team plays each other 2 times
     """
 
-    def __init__(self, assemble_rounds, years, n_managers, n_players, player_stats, money_distribution_type, money_distribution_params, strategies):
+    def __init__(self, assemble_rounds, seasons, n_managers, n_players, player_stats, money_distribution_type, money_distribution_params, strategies, verbose=True):
+        self.verbose = verbose
         # Properties
         self.assemble_rounds = assemble_rounds
-        self.years = years
+        self.seasons = seasons
         self.n_managers = n_managers
         self.n_players = n_players
-        self.player_stats = player_stats
+        self.player_stats = self.transform_fifa(player_stats)
         self.money_distrubtion_type = money_distribution_type
         self.money_distribution_params = money_distribution_params
         self.strategies = strategies
@@ -56,6 +55,19 @@ class FIFA_Simulation(Model):
 
         # Initialization functions
         self.init_agents()
+
+    def transform_fifa(self, player_stats):
+        player_stats['Release Clause'] = player_stats['Release Clause'].apply(self.transform_to_number)
+        return player_stats
+
+    def transform_to_number(self, release_clause):
+        if isinstance(release_clause, float):
+            return 0
+        elif release_clause[-1] == 'K':
+            multiplier = 1000
+        elif release_clause[-1] == 'M':
+            multiplier = 1000000
+        return float(release_clause[1:-1]) * multiplier
 
     def init_agents(self):
         self.init_players()
@@ -69,15 +81,16 @@ class FIFA_Simulation(Model):
         self.chosen_player_stats = self.player_stats.sample(self.n_players)
 
         for i in range(self.n_players):
-            p = Player(self.chosen_player_stats['Name'][i], self, self.chosen_player_stats.iloc[i])
+            p = Player(self.chosen_player_stats.iloc[i]['Name'], self, self.chosen_player_stats.iloc[i])
             self.players.append(p)
+            self.schedule.add_agent(p)
 
     def init_managers(self):
         assets = self.get_assets()
         for i in range(self.n_managers):
             m = Manager(i, self, assets[i], 0, 0, 0)
             self.managers.append(m)
-
+            self.schedule.add_agent(m)
 
     def get_assets(self):
         '''
@@ -100,7 +113,7 @@ class FIFA_Simulation(Model):
 
         Args:
             mu (float): The mean of the normal distribution
-            sigma (float): The standard deviation       
+            sigma (float): The standard deviation
         '''
         return np.random.normal(mu, sigma, self.n_managers)
 
@@ -126,6 +139,17 @@ class FIFA_Simulation(Model):
 
     def run(self):
         """
-        Should run the model after initialization
+        Runs the model after initialization by first assembling the teams and then playing the matches
         """
-        pass
+        for _ in range(self.assemble_rounds):
+            self.schedule.assemble_step()
+        if self.verbose:
+            print('Team assembly complete:')
+            print(str(self.n_managers) + ' managers have picked 18 players')
+            print('Funds of manager 1:')
+            print(self.managers[0].assets)
+            print('Team of manager 1:')
+            print(self.managers[0].team)
+
+        for _ in range(self.seasons):
+            self.schedule.step()

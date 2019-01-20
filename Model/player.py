@@ -26,6 +26,11 @@ class Player(Agent):
         self.stats = stats
         self.offers = []
         self.manager = None
+        # In the field or a substitute player
+        self.active = None
+
+    def assemble_step(self):
+        pass
 
     def step(self):
         pass

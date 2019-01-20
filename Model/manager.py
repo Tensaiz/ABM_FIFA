@@ -20,16 +20,171 @@ class Manager(Agent):
 
     TODO:
         Create trading mechanism between manager agents
-        Create team assembly and team trading mechanics
+        Create team trading mechanics
         Create different optimisation strategies to assemble a team
+        Fix negative assets for a manager when assembling team
     """
-    def __init__(self, name, model, assets, reputation, assemble_strategy, trade_strategy):
+
+    TEAM_SIZE = 18
+    SPECIFIC_POSITION_DICT = {
+        'RF': 'attacker',
+        'ST': 'attacker',
+        'LW': 'midfielder',
+        'GK': 'keeper',
+        'RCM': 'midfielder',
+        'LF': 'attacker',
+        'RS': 'attacker',
+        'RCB': 'defender',
+        'LCM': 'midfielder',
+        'CB': 'defender',
+        'LDM': 'midfielder',
+        'CAM': 'midfielder',
+        'CDM': 'midfielder',
+        'LS': 'attacker',
+        'LCB': 'defender',
+        'RM': 'midfielder',
+        'LAM': 'midfielder',
+        'LM': 'midfielder',
+        'LB': 'defender',
+        'RDM': 'midfielder',
+        'RW': 'midfielder',
+        'CM': 'midfielder',
+        'RB': 'defender',
+        'RAM': 'midfielder',
+        'CF': 'attacker',
+        'RWB': 'defender',
+        'LWB': 'defender'
+    }
+
+    GENERAL_POSITION_DICT = {
+        'keeper': [
+            'GK'
+        ],
+        'attacker': [
+            'RF',
+            'ST',
+            'LF',
+            'RS',
+            'LS',
+            'CF'
+        ],
+        'midfielder': [
+            'LW',
+            'RCM',
+            'LCM',
+            'LDM',
+            'CAM',
+            'CDM',
+            'RM',
+            'LAM',
+            'LM',
+            'RDM',
+            'RW',
+            'CM',
+            'RAM'
+        ],
+        'defender': [
+            'RCB',
+            'CB',
+            'LCB',
+            'LB',
+            'RB',
+            'RWB',
+            'LWB'
+        ]
+    }
+
+    def __init__(self, name, model, assets, reputation, assemble_strategy, trade_strategy, team_type=0):
         super().__init__(name, model)
         self.assets = assets
         self.reputation = reputation
-        self.assemble_strategy = assemble_strategy
-        self.trade_strategy = trade_strategy
-        self.team = {}
+
+        # 1 keeper, 4 defenders, 3 midfielders, 3 attackers
+        # + 1 keeper sub and 6 sub players
+        self.team_type = team_type
+        self.init_empty_team()
+
+        self.assemble_strategy = self.get_assemble_strategy(assemble_strategy)
+        self.trade_strategy = self.get_trade_strategy(trade_strategy)
+
+        # Keep track of past match results
+        self.game_history = []
+
+    def assemble_step(self):
+        for pos, player in self.team.items():
+            if player == None:
+                attempt = 0
+                # Keep picking players until you find one that is in the model and doesn't have a manager yet
+                chosen_player = self.pick_player(pos, attempt)
+                player_agent = next((player for player in self.model.players if player.name == chosen_player['Name'] and player.manager == None), None)
+                while (player_agent == None):
+                    chosen_player = self.pick_player(pos, attempt)
+                    # Get the player agent to assign to the team
+                    player_agent = next((player for player in self.model.players if player.name == chosen_player['Name'] and player.manager == None), None)
+                    attempt += 1
+                self.team[pos] = player_agent
+                self.assets -= chosen_player['Release Clause']
+                if pos[0:3] == 'sub':
+                    player_agent.active = False
+                else:
+                    player_agent.active = True
+                player_agent.manager = self
+
+    def pick_player(self, pos, attempt):
+        money_available_for_pos = self.assemble_strategy[pos]
+ 
+        # List of players that have the same release clause as the money the manager wants to spend for the position
+        suitable_players = self.model.chosen_player_stats[self.model.chosen_player_stats['Release Clause'] == money_available_for_pos]
+        if pos.split('_')[0] != 'sub':
+            pos = pos.split('_')[0]
+            suitable_players = suitable_players[suitable_players['Position'].isin(self.GENERAL_POSITION_DICT[pos])]
+        if len(suitable_players) > 0:
+            # Pick the player with the highest overall rating
+            return suitable_players[suitable_players['Overall'] == suitable_players['Overall'].max()].iloc(attempt)
+        else:
+            # If there are none, find the closest release clause
+            return self.model.chosen_player_stats.iloc[(self.model.chosen_player_stats['Release Clause'] - money_available_for_pos).abs().argsort().iloc[attempt]]
 
     def step(self):
         pass
+
+
+    def get_assemble_strategy(self, strategy):
+        '''
+        This function should return a dictionary with the amount of money the manager should spend per player to assemble his team
+        '''
+        if strategy == 0:
+            if self.team_type == 0:
+                # Spend an even amount of money on each player
+                money = self.assets / self.TEAM_SIZE
+                strategy = {'keeper': money}
+                # 4 defenders, 3 midfielders, 3 attackers
+                for i in range(4):
+                    strategy['defender_' + str(i + 1)] = money
+                for i in range(3):
+                    strategy['midfielder_' + str(i + 1)] = money
+                for i in range(3):
+                    strategy['attacker_' + str(i + 1)] = money
+            strategy['sub_keeper'] = money
+            for i in range(6):
+                strategy['sub_player_' + str(i + 1)] = money
+            return strategy
+
+    def get_trade_strategy(self, strategy):
+        pass
+
+    def init_empty_team(self):
+        self.team = {
+            'keeper': None,
+        }
+        if self.team_type == 0:
+            # 4 defenders, 3 midfielders, 3 attackers
+            for i in range(4):
+                self.team['defender_' + str(i + 1)] = None
+            for i in range(3):
+                self.team['midfielder_' + str(i + 1)] = None
+            for i in range(3):
+                self.team['attacker_' + str(i + 1)] = None
+        self.team['sub_keeper'] = None
+        for i in range(6):
+            self.team['sub_player_' + str(i + 1)] = None

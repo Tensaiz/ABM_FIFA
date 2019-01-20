@@ -24,27 +24,24 @@ This project contains multiple files belonging to the model and top-level runnin
 
 ### TODO:
 
-- Add agents to scheduler
-- Run the scheduler
-- Create pools for manager teams after team assembly
+#### Model
+
+- Implement match system where pools are created that have 18 managers and each (manager) team plays each other 2 times
 
 #### Player
 
 - Needs a step function to determine what the player does every action,
-- For the first few steps it should be considering between open invitations to teams (when teams are assembled)
 - Afterwards it should choose between new teams if he is invited by a manager
 
 #### Manager
 
 - Create trading mechanism between manager agents
-- Create team assembly and team trading mechanics
+- Create team trading mechanics
 - Create different optimisation strategies to assemble a team
+- Fix negative assets for a manager when assembling team
 
 #### Scheduler
 
-- Implement a schedule
-    - Different schedule stages (initial offers -> matches)
-    - Incorporate years and seasons
 - Incorporate aging
 
 
