@@ -119,12 +119,14 @@ class Manager(Agent):
                 # Keep picking players until you find one that is in the model and doesn't have a manager yet
                 chosen_players = self.pick_player(pos)
                 chosen_player = chosen_players.iloc[0]
+                # Might have to catch a key error if the player isn't in the dictionary here
                 player_agent = self.model.player_lookup[chosen_player['Name']]
                 if player_agent.manager != None:
                     player_agent = None
                 while (player_agent == None):
                     chosen_player = chosen_players.iloc[attempt]
                     # Get the player agent to assign to the team
+                    # Might have to catch a key error if the player isn't in the dictionary here
                     player_agent = self.model.player_lookup[chosen_player['Name']]
                     if player_agent.manager != None:
                         player_agent = None

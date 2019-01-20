@@ -2,6 +2,7 @@ import random
 from mesa.time import RandomActivation
 
 from manager import Manager
+from utility import match_outcome
 
 class RandomActivationFIFA(RandomActivation):
     '''
@@ -55,7 +56,30 @@ class RandomActivationFIFA(RandomActivation):
 
 
     def play_matches(self):
-        pass
+        '''
+        Let every manager in each pool play against the other managers in that pool twice
+        '''
+        for pool in self.model.pools:
+            for manager in pool:
+                for manager_2 in pool:
+                    if manager == manager_2:
+                        continue
+                    self.play_match(manager, manager_2)
+
+    def play_match(self, manager_1, manager_2):
+        outcome = match_outcome(manager_1, manager_2)
+        if outcome == 0:
+            # Manager one won
+            manager_1.game_history.append(0)
+            manager_2.game_history.append(1)
+        elif outcome == 1:
+            # Manager two won
+            manager_1.game_history.append(1)
+            manager_2.game_history.append(0)
+        elif outcome == 2:
+            # Tie
+            manager_1.game_history.append(2)
+            manager_2.game_history.append(2)
 
     def shuffle_agents(self):
         random.shuffle(self.managers)

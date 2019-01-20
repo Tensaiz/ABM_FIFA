@@ -6,7 +6,9 @@ def match_outcome(manager_1, manager_2):
         team_1 (:obj: manager): 
         team_2 (:obj: manager): 
     Returns:
-        outcome (boolean): The outcome of the match, whether team_1 has won from team_2
+        outcome (int): The outcome of the match, whether team_1 has won from team_2
+            0 = team_1 won
+            1 = team_2 won
+            2 = tie
     """
-    pass
-
+    return 0

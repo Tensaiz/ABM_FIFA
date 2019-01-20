@@ -22,7 +22,7 @@ class FIFA_Simulation(Model):
     Args:
         assemble_rounds (int): Amount of rounds it should take for all teams to form
         seasons (int): Amount of seasons to simulate
-        n_managers (int): The amount of managers to use.
+        n_pools (int): The amount of pools to use. Amount of managers is 18 times this number.
         n_players (int): The amount of players to use from the FIFA dataset. 0 can be used to select all players.
         player_stats (pandas dataframe): A FIFA dataset of players with all their corresponding stats
         money_distribution_type (int): The type of money distribution to use for the managers
@@ -37,12 +37,13 @@ class FIFA_Simulation(Model):
         - Implement match system where pools are created that have 18 managers and each (manager) team plays each other 2 times
     """
 
-    def __init__(self, assemble_rounds, seasons, n_managers, n_players, player_stats, money_distribution_type, money_distribution_params, strategies, verbose=True):
+    def __init__(self, assemble_rounds, seasons, n_pools, n_players, player_stats, money_distribution_type, money_distribution_params, strategies, verbose=True):
         self.verbose = verbose
         # Properties
         self.assemble_rounds = assemble_rounds
         self.seasons = seasons
-        self.n_managers = n_managers
+        self.n_pools = n_pools
+        self.n_managers = 18 * n_pools
         self.n_players = n_players
         self.player_stats = self.transform_fifa(player_stats)
         self.money_distrubtion_type = money_distribution_type
@@ -50,6 +51,7 @@ class FIFA_Simulation(Model):
         self.strategies = strategies
 
         self.managers = []
+        self.pools = []
         self.players = []
 
         self.player_lookup = {}
@@ -146,6 +148,17 @@ class FIFA_Simulation(Model):
         return np.random.exponential(scale, self.n_managers)
 
 
+    def create_pools(self):
+        for i in range(self.n_pools):
+            start = i * 18
+            end = i * 18 + 18
+            self.pools.append(self.managers[start : end])
+
+    def print_results(self):
+        print('Win / loss overview per manager:')
+        for manager in self.managers:
+            print(manager.game_history)
+
     def run(self):
         """
         Runs the model after initialization by first assembling the teams and then playing the matches
@@ -154,9 +167,12 @@ class FIFA_Simulation(Model):
         for _ in range(self.assemble_rounds):
             self.schedule.assemble_step()
         print("Assembling teams took --- %s seconds ---" % (time.time() - start_time))
-        if self.verbose:
-            pass
+
+        self.create_pools()
+
         start_time = time.time()
         for _ in range(self.seasons):
             self.schedule.step()
         print("Simulating seasons took --- %s seconds ---" % (time.time() - start_time))
+
+        self.print_results()
