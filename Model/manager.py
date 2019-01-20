@@ -22,7 +22,6 @@ class Manager(Agent):
         Create trading mechanism between manager agents
         Create team trading mechanics
         Create different optimisation strategies to assemble a team
-        Fix negative assets for a manager when assembling team
     """
 
     TEAM_SIZE = 18
@@ -96,6 +95,7 @@ class Manager(Agent):
 
     def __init__(self, name, model, assets, reputation, assemble_strategy, trade_strategy, team_type=0):
         super().__init__(name, model)
+        self.name = name
         self.assets = assets
         self.reputation = reputation
 
@@ -111,16 +111,23 @@ class Manager(Agent):
         self.game_history = []
 
     def assemble_step(self):
+        if self.model.verbose:
+            print('Manager ' + str(self.name) + ' has ' + str(self.assets) + ' funds available to pick players')
         for pos, player in self.team.items():
             if player == None:
                 attempt = 0
                 # Keep picking players until you find one that is in the model and doesn't have a manager yet
-                chosen_player = self.pick_player(pos, attempt)
-                player_agent = next((player for player in self.model.players if player.name == chosen_player['Name'] and player.manager == None), None)
+                chosen_players = self.pick_player(pos)
+                chosen_player = chosen_players.iloc[0]
+                player_agent = self.model.player_lookup[chosen_player['Name']]
+                if player_agent.manager != None:
+                    player_agent = None
                 while (player_agent == None):
-                    chosen_player = self.pick_player(pos, attempt)
+                    chosen_player = chosen_players.iloc[attempt]
                     # Get the player agent to assign to the team
-                    player_agent = next((player for player in self.model.players if player.name == chosen_player['Name'] and player.manager == None), None)
+                    player_agent = self.model.player_lookup[chosen_player['Name']]
+                    if player_agent.manager != None:
+                        player_agent = None
                     attempt += 1
                 self.team[pos] = player_agent
                 self.assets -= chosen_player['Release Clause']
@@ -130,7 +137,7 @@ class Manager(Agent):
                     player_agent.active = True
                 player_agent.manager = self
 
-    def pick_player(self, pos, attempt):
+    def pick_player(self, pos):
         money_available_for_pos = self.assemble_strategy[pos]
  
         # List of players that have the same release clause as the money the manager wants to spend for the position
@@ -140,10 +147,13 @@ class Manager(Agent):
             suitable_players = suitable_players[suitable_players['Position'].isin(self.GENERAL_POSITION_DICT[pos])]
         if len(suitable_players) > 0:
             # Pick the player with the highest overall rating
-            return suitable_players[suitable_players['Overall'] == suitable_players['Overall'].max()].iloc(attempt)
+            return suitable_players[suitable_players['Overall'].argsort()[::-1]]
         else:
-            # If there are none, find the closest release clause
-            return self.model.chosen_player_stats.iloc[(self.model.chosen_player_stats['Release Clause'] - money_available_for_pos).abs().argsort().iloc[attempt]]
+            # If there are none, find the closest release clause that is smaller than the money available
+            possibilities = self.model.chosen_player_stats[self.model.chosen_player_stats['Release Clause'] - money_available_for_pos <= 0]
+            if pos.split('_')[0] != 'sub':
+                possibilities = possibilities[possibilities['Position'].isin(self.GENERAL_POSITION_DICT[pos])]
+            return possibilities.iloc[(possibilities['Release Clause'] - money_available_for_pos).abs().argsort()]
 
     def step(self):
         pass

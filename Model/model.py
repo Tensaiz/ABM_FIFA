@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 # mesa
 from mesa import Model
@@ -51,13 +52,17 @@ class FIFA_Simulation(Model):
         self.managers = []
         self.players = []
 
+        self.player_lookup = {}
+
         self.schedule = RandomActivationFIFA(self)
 
         # Initialization functions
         self.init_agents()
 
     def transform_fifa(self, player_stats):
+        start_time = time.time()
         player_stats['Release Clause'] = player_stats['Release Clause'].apply(self.transform_to_number)
+        print("Transforming fifa data took --- %s seconds ---" % (time.time() - start_time))
         return player_stats
 
     def transform_to_number(self, release_clause):
@@ -70,8 +75,10 @@ class FIFA_Simulation(Model):
         return float(release_clause[1:-1]) * multiplier
 
     def init_agents(self):
+        start_time = time.time()
         self.init_players()
         self.init_managers()
+        print("Initializing agents took --- %s seconds ---" % (time.time() - start_time))
 
     def init_players(self):
         if self.n_players == 0:
@@ -82,6 +89,8 @@ class FIFA_Simulation(Model):
 
         for i in range(self.n_players):
             p = Player(self.chosen_player_stats.iloc[i]['Name'], self, self.chosen_player_stats.iloc[i])
+            # Associate player objects by their name in a map to find them efficiently
+            self.player_lookup[p.name] = p
             self.players.append(p)
             self.schedule.add_agent(p)
 
@@ -141,15 +150,13 @@ class FIFA_Simulation(Model):
         """
         Runs the model after initialization by first assembling the teams and then playing the matches
         """
+        start_time = time.time()
         for _ in range(self.assemble_rounds):
             self.schedule.assemble_step()
+        print("Assembling teams took --- %s seconds ---" % (time.time() - start_time))
         if self.verbose:
-            print('Team assembly complete:')
-            print(str(self.n_managers) + ' managers have picked 18 players')
-            print('Funds of manager 1:')
-            print(self.managers[0].assets)
-            print('Team of manager 1:')
-            print(self.managers[0].team)
-
+            pass
+        start_time = time.time()
         for _ in range(self.seasons):
             self.schedule.step()
+        print("Simulating seasons took --- %s seconds ---" % (time.time() - start_time))

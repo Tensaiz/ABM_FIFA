@@ -35,15 +35,17 @@ This project contains multiple files belonging to the model and top-level runnin
 
 #### Manager
 
-- Create trading mechanism between manager agents
-- Create team trading mechanics
+- Create purchase mechanism between manager agents
+- Create player buying mechanics
 - Create different optimisation strategies to assemble a team
-- Fix negative assets for a manager when assembling team
 
 #### Scheduler
 
 - Incorporate aging
 
+#### Utility
+
+- Create match system between managers
 
 ### Literature and sources
 
