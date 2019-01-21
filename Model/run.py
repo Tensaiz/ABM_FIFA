@@ -6,7 +6,7 @@ def run_FIFA_model():
     FIFA_data = pd.read_csv('../data.csv')
 
     assemble_rounds = 1
-    seasons = 1
+    seasons = 10
     # Amount of managers is 18 * n_pools
     n_pools = 1
     n_players = 0

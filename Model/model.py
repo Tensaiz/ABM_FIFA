@@ -64,11 +64,14 @@ class FIFA_Simulation(Model):
     def transform_fifa(self, player_stats):
         start_time = time.time()
         player_stats['Release Clause'] = player_stats['Release Clause'].apply(self.transform_to_number)
+        player_stats['Value'] = player_stats['Value'].apply(self.transform_to_number)
         print("Transforming fifa data took --- %s seconds ---" % (time.time() - start_time))
         return player_stats
 
     def transform_to_number(self, release_clause):
         if isinstance(release_clause, float):
+            return 0
+        elif release_clause == '€0':
             return 0
         elif release_clause[-1] == 'K':
             multiplier = 1000
