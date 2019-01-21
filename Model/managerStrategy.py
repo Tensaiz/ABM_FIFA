@@ -14,7 +14,46 @@ class ManagerStrategy(object):
 
 
 
+class ExampleStrategy(ManagerStrategy):
+
+    def __init__(self, model):
+        super().__init__(model)
+
+    def getAssemblyStrategy(self, currentManager):
+        #expenentialy distributed assets over players
+        total = currentManager.assets
+        strategy = {'keeper': total // 2}
+        total = total // 2 # rest
+        for i in range(4):
+            strategy['defender_' + str(i + 1)] = total // 2
+            total = total // 2
+        for i in range(3):
+            strategy['midfielder_' + str(i + 1)] = total // 2
+            total = total / 2
+        for i in range(3):
+            strategy['attacker_' + str(i + 1)] = total // 2
+            total = total // 2
+
+        for i in range(6):
+            strategy['sub_player_' + str(i + 1)] = total // 2
+            total // 2
+
+
+        strategy['sub_keeper'] = total
+        return strategy
+
+
+    def getTradeStrategy(self, currentManager):
+        # use the same strategy as in Assembly
+        return self.getAssemblyStrategy(currentManager)
+
+
+
+
 class EvenStrategy(ManagerStrategy):
+
+    def __init__(self, model):
+        super().__init__(model)
 
 
     def getAssemblyStrategy(self, currentManager):
@@ -36,4 +75,5 @@ class EvenStrategy(ManagerStrategy):
         return strategy
 
     def getTradeStrategy(self, currentManager):
+
         pass
