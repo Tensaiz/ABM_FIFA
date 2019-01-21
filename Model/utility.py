@@ -20,6 +20,8 @@ def match_outcome(manager_1, manager_2):
             1 = team_2 won
             2 = tie
     """
+    age_p = average_age_win_probability(manager_1, manager_2)
+    age_weight = 0.25
     market_p = market_value_win_probability(manager_1, manager_2)
     market_weight = 1
     victory_p = market_p * market_weight
@@ -36,6 +38,24 @@ def match_outcome(manager_1, manager_2):
 
     return result
 
+
+def average_age_win_probability(manager_1, manager_2):
+    team_1_average_age = get_average_age_team(manager_1)
+    team_2_average_age = get_average_age_team(manager_2)
+    difference_average_ages = team_1_average_age - team_2_average_age
+    return 1/(1+math.exp(-(32*difference_average_ages-(difference_average_ages)**3)/131))
+
+def get_average_age_team(manager):
+    '''
+    Calculate the average age of the team
+    '''
+    sum_ages = 0      
+    positions = manager.team.keys()
+    for position in positions:
+        player = manager.team[position]       
+        sum_ages += player.stats['Age']           
+    return sum_ages / len(positions)        
+     
 def market_value_win_probability(manager_1, manager_2):
     '''
     Use sigmoid function to calculate probability of team 1 winning over team 2 based on average market value of the teams

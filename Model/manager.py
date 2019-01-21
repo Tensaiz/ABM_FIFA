@@ -128,7 +128,7 @@ class Manager(Agent):
                 if player_agent.manager != None:
                     player_agent = None
                 while (player_agent == None):
-                    # Maybe attempt can overflow, if we need more then some number of players.
+                    # Maybe attempt can overflow, if we need more than the amount of players available.
                     chosen_player = chosen_players.iloc[attempt]
                     # Get the player agent to assign to the team
                     # Might have to catch a key error if the player isn't in the dictionary here
