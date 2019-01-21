@@ -29,8 +29,20 @@ class Player(Agent):
         # In the field or a substitute player
         self.active = None
 
-    def assemble_step(self):
-        pass
-
     def step(self):
-        pass
+        """
+        Takes offers into account after season finishes. The (first) manager with the highest reputation is
+        chosen by the player.
+        """
+        if self.manager is None:
+            highest_rep_manager = None
+            highest_rep = 0
+        else:
+            highest_rep_manager = self.manager
+            highest_rep = self.manager.reputation
+
+        for manager in self.offers:
+            if manager.reputation > highest_rep:
+                highest_rep_manager = manager
+
+        self.manager = highest_rep_manager

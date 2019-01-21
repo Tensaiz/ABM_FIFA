@@ -34,9 +34,6 @@ class RandomActivationFIFA(RandomActivation):
         self.shuffle_agents()
         for manager in self.managers:
             manager.assemble_step()
-        
-        for player in self.players:
-            player.assemble_step()
 
         self.increment_time()
 
