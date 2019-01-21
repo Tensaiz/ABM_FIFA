@@ -21,13 +21,18 @@ def match_outcome(manager_1, manager_2):
             2 = tie
     """
     market_p = market_value_win_probability(manager_1, manager_2)
-    draw = random.uniform(0, 1)
-    if draw < market_p:
-        result = 0
-    elif draw > market_p:
-        result = 1
-    else:
+    market_weight = 1
+    victory_p = market_p * market_weight
+    draw = get_draw(victory_p)
+
+    chance = random.uniform(0, 1)
+
+    if draw == chance:
         result = 2
+    elif chance < victory_p:
+        result = 0
+    elif chance > victory_p:
+        result = 1
 
     return result
 
@@ -49,3 +54,6 @@ def get_manager_market_value(manager):
         player = manager.team[position]
         market_value += player.stats['Value']
     return market_value / len(positions)
+
+def get_draw(p_victory):
+    return (1/3) * math.exp(-( (p_victory-0.5)^2 / (2 * 0.28^2)))
