@@ -160,7 +160,7 @@ class FIFA_Simulation(Model):
     def print_results(self):
         print('Win / loss overview per manager:')
         for manager in self.managers:
-            print(manager.game_history)
+            print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + ' and has ' + str(manager.game_history.count(1)) + ' wins and ' + str(manager.game_history.count(0)) + ' losses.')
 
     def run(self):
         """
