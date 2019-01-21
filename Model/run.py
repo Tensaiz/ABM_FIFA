@@ -15,7 +15,7 @@ def run_FIFA_model():
     money_distribution_params = {'mu': 25000000, 'sigma':2500000}
     strategies = []
 
-    verbose = False
+    verbose = True
 
     model = FIFA_Simulation(assemble_rounds, seasons, n_pools, n_players, player_stats, money_distribution_type, money_distribution_params, strategies, verbose)
     model.run()

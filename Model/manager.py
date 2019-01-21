@@ -22,6 +22,7 @@ class Manager(Agent):
         Create trading mechanism between manager agents
         Create team trading mechanics
         Create different optimisation strategies to assemble a team
+        Add Strategy design pattern for manager strategies
     """
 
     TEAM_SIZE = 18
@@ -124,6 +125,7 @@ class Manager(Agent):
                 if player_agent.manager != None:
                     player_agent = None
                 while (player_agent == None):
+                    # Maybe attempt can overflow, if we need more then some number of players.
                     chosen_player = chosen_players.iloc[attempt]
                     # Get the player agent to assign to the team
                     # Might have to catch a key error if the player isn't in the dictionary here
