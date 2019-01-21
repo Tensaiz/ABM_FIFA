@@ -96,6 +96,7 @@ class Manager(Agent):
     def __init__(self, name, model, assets, reputation, assemble_strategy, trade_strategy, team_type=0):
         super().__init__(name, model)
         self.name = name
+        self.starting_assets = assets
         self.assets = assets
         self.reputation = reputation
 
