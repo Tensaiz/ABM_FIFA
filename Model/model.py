@@ -32,9 +32,6 @@ class FIFA_Simulation(Model):
             3 = constant
         money_distrbution_params (:obj: any): Required parameters for the money distribution used
         strategies (:list:`int`): A list with the different strategies
-
-    TODO:
-        - Implement match system where pools are created that have 18 managers and each (manager) team plays each other 2 times
     """
 
     def __init__(self, assemble_rounds, seasons, n_pools, n_players, player_stats, money_distribution_type, money_distribution_params, strategies, verbose=True):
@@ -158,7 +155,7 @@ class FIFA_Simulation(Model):
             self.pools.append(self.managers[start : end])
 
     def print_results(self):
-        print('Win / loss overview per manager:')
+        print('Win / loss overview per manager after ' + str(self.seasons) +' seasons:')
         for manager in self.managers:
             print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + ' and has ' + str(manager.game_history.count(1)) + ' wins and ' + str(manager.game_history.count(0)) + ' losses.')
 
