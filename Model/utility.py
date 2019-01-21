@@ -56,4 +56,4 @@ def get_manager_market_value(manager):
     return market_value / len(positions)
 
 def get_draw(p_victory):
-    return (1/3) * math.exp(-( (p_victory-0.5)^2 / (2 * 0.28^2)))
+    return (1/3) * math.exp(-( (p_victory-0.5)**2 / (2 * 0.28**2)))
