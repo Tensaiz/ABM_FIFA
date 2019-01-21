@@ -1,15 +1,15 @@
 class ManagerStrategy(object):
 
 
-    def __init__(self):
-        pass
+    def __init__(self, model):
+        self.model = model
 
 
-    def getAssemblyStrategy(self, team_type, assets, TEAM_SIZE):
+    def getAssemblyStrategy(self, currentManager):
         raise NotImplementedError()
 
 
-    def getStepStrategy(self):
+    def getTradeStrategy(self, currentManager):
         raise NotImplementedError()
 
 
@@ -17,10 +17,11 @@ class ManagerStrategy(object):
 class EvenStrategy(ManagerStrategy):
 
 
-    def getAssemblyStrategy(self, team_type, assets, TEAM_SIZE):
-        if team_type == 0:
+    def getAssemblyStrategy(self, currentManager):
+        # pass just current manager :D
+        if currentManager.team_type == 0:
             # Spend an even amount of money on each player
-            money = assets / TEAM_SIZE
+            money = currentManager.assets / currentManager.TEAM_SIZE
             strategy = {'keeper': money}
             # 4 defenders, 3 midfielders, 3 attackers
             for i in range(4):
@@ -33,3 +34,6 @@ class EvenStrategy(ManagerStrategy):
         for i in range(6):
             strategy['sub_player_' + str(i + 1)] = money
         return strategy
+
+    def getTradeStrategy(self, currentManager):
+        pass

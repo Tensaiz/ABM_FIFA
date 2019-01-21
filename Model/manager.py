@@ -108,8 +108,8 @@ class Manager(Agent):
 
 
         self.strategy = strategy
-        self.assemble_strategy = strategy.getAssemblyStrategy(0, self.assets, self.TEAM_SIZE)
-        self.trade_strategy = self.get_trade_strategy(trade_strategy)
+        self.assemble_strategy = self.strategy.getAssemblyStrategy(self)
+        self.trade_strategy = self.strategy.getTradeStrategy(self)
 
         # Keep track of past match results
         self.game_history = []
@@ -146,7 +146,7 @@ class Manager(Agent):
 
     def pick_player(self, pos):
         money_available_for_pos = self.assemble_strategy[pos]
- 
+
         # List of players that have the same release clause as the money the manager wants to spend for the position
         suitable_players = self.model.chosen_player_stats[self.model.chosen_player_stats['Release Clause'] == money_available_for_pos]
         if pos.split('_')[0] != 'sub':
@@ -165,16 +165,6 @@ class Manager(Agent):
     def step(self):
         pass
 
-
-    def get_assemble_strategy(self):
-        '''
-        This function should return a dictionary with the amount of money the manager should spend per player to assemble his team
-        '''
-        self.strategy.getAssemblyStrategy(0, self.assets, self.TEAM_SIZE)
-
-
-    def get_trade_strategy(self, strategy):
-        pass
 
     def init_empty_team(self):
         self.team = {

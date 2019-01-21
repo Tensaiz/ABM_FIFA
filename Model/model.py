@@ -103,7 +103,7 @@ class FIFA_Simulation(Model):
     def init_managers(self):
         assets = self.get_assets()
         for i in range(self.n_managers):
-            m = Manager(i, self, assets[i], 0, managerStrategy.EvenStrategy(), 0)
+            m = Manager(i, self, assets[i], 0, managerStrategy.EvenStrategy(self), 0)
             self.managers.append(m)
             self.schedule.add_agent(m)
 
