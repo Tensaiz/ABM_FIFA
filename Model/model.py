@@ -9,6 +9,7 @@ from mesa.datacollection import DataCollector
 from fifa_schedule import RandomActivationFIFA
 from player import Player
 from manager import Manager
+import managerStrategy
 
 class FIFA_Simulation(Model):
     """
@@ -99,7 +100,7 @@ class FIFA_Simulation(Model):
     def init_managers(self):
         assets = self.get_assets()
         for i in range(self.n_managers):
-            m = Manager(i, self, assets[i], 0, 0, 0)
+            m = Manager(i, self, assets[i], 0, managerStrategy.EvenStrategy(), 0)
             self.managers.append(m)
             self.schedule.add_agent(m)
 

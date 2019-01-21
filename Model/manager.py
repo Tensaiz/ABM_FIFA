@@ -94,7 +94,7 @@ class Manager(Agent):
         ]
     }
 
-    def __init__(self, name, model, assets, reputation, assemble_strategy, trade_strategy, team_type=0):
+    def __init__(self, name, model, assets, reputation, strategy, trade_strategy, team_type=0):
         super().__init__(name, model)
         self.name = name
         self.starting_assets = assets
@@ -106,7 +106,9 @@ class Manager(Agent):
         self.team_type = team_type
         self.init_empty_team()
 
-        self.assemble_strategy = self.get_assemble_strategy(assemble_strategy)
+
+        self.strategy = strategy
+        self.assemble_strategy = strategy.getAssemblyStrategy(0, self.assets, self.TEAM_SIZE)
         self.trade_strategy = self.get_trade_strategy(trade_strategy)
 
         # Keep track of past match results
@@ -164,26 +166,12 @@ class Manager(Agent):
         pass
 
 
-    def get_assemble_strategy(self, strategy):
+    def get_assemble_strategy(self):
         '''
         This function should return a dictionary with the amount of money the manager should spend per player to assemble his team
         '''
-        if strategy == 0:
-            if self.team_type == 0:
-                # Spend an even amount of money on each player
-                money = self.assets / self.TEAM_SIZE
-                strategy = {'keeper': money}
-                # 4 defenders, 3 midfielders, 3 attackers
-                for i in range(4):
-                    strategy['defender_' + str(i + 1)] = money
-                for i in range(3):
-                    strategy['midfielder_' + str(i + 1)] = money
-                for i in range(3):
-                    strategy['attacker_' + str(i + 1)] = money
-            strategy['sub_keeper'] = money
-            for i in range(6):
-                strategy['sub_player_' + str(i + 1)] = money
-            return strategy
+        self.strategy.getAssemblyStrategy(0, self.assets, self.TEAM_SIZE)
+
 
     def get_trade_strategy(self, strategy):
         pass
