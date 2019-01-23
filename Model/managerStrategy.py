@@ -1,23 +1,19 @@
 class ManagerStrategy(object):
 
 
-    def __init__(self, model):
+    def __init__(self, model = None):
         self.model = model
 
 
     def getAssemblyStrategy(self, currentManager):
         raise NotImplementedError()
 
-
     def getTradeStrategy(self, currentManager):
         raise NotImplementedError()
 
 
-
 class ExampleStrategy(ManagerStrategy):
 
-    def __init__(self, model):
-        super().__init__(model)
 
     def getAssemblyStrategy(self, currentManager):
         #expenentialy distributed assets over players
@@ -42,19 +38,12 @@ class ExampleStrategy(ManagerStrategy):
         strategy['sub_keeper'] = total
         return strategy
 
-
     def getTradeStrategy(self, currentManager):
         # use the same strategy as in Assembly
         return self.getAssemblyStrategy(currentManager)
 
 
-
-
 class EvenStrategy(ManagerStrategy):
-
-    def __init__(self, model):
-        super().__init__(model)
-
 
     def getAssemblyStrategy(self, currentManager):
         # pass just current manager :D

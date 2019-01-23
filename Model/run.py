@@ -1,5 +1,5 @@
 import pandas as pd
-
+import managerStrategy
 from model import FIFA_Simulation
 
 def run_FIFA_model():
@@ -13,7 +13,7 @@ def run_FIFA_model():
     player_stats = FIFA_data
     money_distribution_type = 0
     money_distribution_params = {'mu': 25000000, 'sigma':2500000}
-    strategies = []
+    strategies = [managerStrategy.EvenStrategy()]
 
     verbose = True
 

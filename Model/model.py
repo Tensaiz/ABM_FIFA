@@ -99,8 +99,15 @@ class FIFA_Simulation(Model):
 
     def init_managers(self):
         assets = self.get_assets()
+        #seting
+        j = 0
         for i in range(self.n_managers):
-            m = Manager(i, self, assets[i], 0, managerStrategy.EvenStrategy(self), 0)
+
+            strategy = self.strategies[i % len(self.strategies)]
+            strategy.model = self # Some strategies need access to model
+            # Then they are able to make better decisions
+
+            m = Manager(i, self, assets[i], 0, strategy, 0)
             self.managers.append(m)
             self.schedule.add_agent(m)
 
