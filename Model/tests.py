@@ -3,16 +3,13 @@ import pandas as pd
 import sys
 import inspect
 from model import FIFA_Simulation
+import logging
 
 
 class TestUtility(unittest.TestCase):
 
     def test_utility(self):
         pass
-
-
-
-
 
     def test_moneySumInStrategies(self):
         # money sum instrategy should <= totalAssets
@@ -40,9 +37,8 @@ class TestUtility(unittest.TestCase):
         # now, the strategies should be initialized, so we can test them
         for man in model.managers:
             stra = man.strategy.getAssemblyStrategy(man)
-            #print("[*] Checking Strategy and manager assets:", stra.__name__)
-            #print("[*] Assets: ", man.assets)
-            self.assertGreaterEqual(man.assets, sum(stra.values()))
+            msg = "in: " + man.strategy.__class__.__name__ + ", the diff is : " + str(man.assets - sum(stra.values()))
+            self.assertGreaterEqual(man.assets, sum(stra.values()), msg=msg)
 
 
 

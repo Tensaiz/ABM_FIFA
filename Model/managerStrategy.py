@@ -25,14 +25,14 @@ class ExampleStrategy(ManagerStrategy):
             total = total // 2
         for i in range(3):
             strategy['midfielder_' + str(i + 1)] = total // 2
-            total = total / 2
+            total = total // 2
         for i in range(3):
             strategy['attacker_' + str(i + 1)] = total // 2
             total = total // 2
 
         for i in range(6):
             strategy['sub_player_' + str(i + 1)] = total // 2
-            total // 2
+            total = total // 2
 
 
         strategy['sub_keeper'] = total
