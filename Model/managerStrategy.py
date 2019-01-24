@@ -1,6 +1,5 @@
 class ManagerStrategy(object):
 
-
     def __init__(self, model = None):
         self.model = model
 
@@ -14,8 +13,8 @@ class ManagerStrategy(object):
     def executeRecoveryStrategy(self, currentManager):
         raise NotImplementedError()
 
-class ExampleStrategy(ManagerStrategy):
 
+class ExampleStrategy(ManagerStrategy):
 
     def getAssemblyStrategy(self, currentManager):
         #expenentialy distributed assets over players
@@ -48,6 +47,7 @@ class ExampleStrategy(ManagerStrategy):
         # use the same strategy as in Assembly
         return self.getAssemblyStrategy(currentManager)
 
+
 class EvenStrategy(ManagerStrategy):
 
     def getAssemblyStrategy(self, currentManager):
@@ -67,6 +67,18 @@ class EvenStrategy(ManagerStrategy):
         for i in range(6):
             strategy['sub_player_' + str(i + 1)] = money
         return strategy
+
+    def executeTradeStrategy(self, currentManager):
+        pass
+
+    def executeRecoveryStrategy(self, currentManager):
+        pass
+
+
+class BestPlayerStrategy(ManagerStrategy):
+
+    def getAssemblyStrategy(self, currentManager):
+        pass
 
     def executeTradeStrategy(self, currentManager):
         pass

@@ -94,12 +94,11 @@ class Manager(Agent):
         ]
     }
 
-    def __init__(self, name, model, assets, earnings, reputation, strategy, team_type=0):
+    def __init__(self, name, model, assets, reputation, strategy, team_type=0):
         super().__init__(name, model)
         self.name = name
         self.starting_assets = assets
         self.assets = assets
-        self.earnings = earnings
         self.reputation = reputation
 
         # 1 keeper, 4 defenders, 3 midfielders, 3 attackers
@@ -164,11 +163,12 @@ class Manager(Agent):
             return possibilities.iloc[(possibilities['Release Clause'] - money_available_for_pos).abs().argsort()]
 
     def step(self):
-        self.strategy.executeTradeStrategy(self)
-        self.assets + self.earnings
+        for offer in self.strategy.executeTradeStrategy(self):
+            offer.execute()
 
     def recovery_step(self):
-        self.strategy.executeRecoveryStrategy(self)
+        for offer in self.strategy.executeRecoveryStrategy(self):
+            offer.execute()
 
     def init_empty_team(self):
         self.team = {
