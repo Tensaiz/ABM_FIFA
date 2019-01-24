@@ -44,8 +44,11 @@ class FIFA_Simulation(Model):
         self.n_managers = 18 * n_pools
         self.n_players = n_players
         self.player_stats = self.transform_fifa(player_stats)
-        self.money_distrubtion_type = money_distribution_type
+        self.money_distribution_type = money_distribution_type
         self.money_distribution_params = money_distribution_params
+        self.earnings_distribution_type = money_distribution_type
+        self.earnings_distribution_params = money_distribution_params((money_distribution_params.key(),
+                                                                       [x / 10 for x in money_distribution_params.values()]))
         self.strategies = strategies
 
         self.managers = []
@@ -99,13 +102,14 @@ class FIFA_Simulation(Model):
 
     def init_managers(self):
         assets = self.get_assets()
+        earnings = self.get_earnings()
         for i in range(self.n_managers):
 
             strategy = self.strategies[i % len(self.strategies)]
             strategy.model = self # Some strategies need access to model
             # Then they are able to make better decisions
 
-            m = Manager(i, self, assets[i], 0, strategy, 0)
+            m = Manager(i, self, assets[i], earnings[i], 0, strategy, 0)
             self.managers.append(m)
             self.schedule.add_agent(m)
 
@@ -113,15 +117,31 @@ class FIFA_Simulation(Model):
         '''
         Return a list of n_managers length containing different assets for the managers depending on money_distribution_type
         '''
-        if self.money_distrubtion_type == 0:
+        if self.money_distribution_type == 0:
             assets = self.normal_asset_distribution(self.money_distribution_params['mu'], self.money_distribution_params['sigma'])
-        elif self.money_distrubtion_type == 1:
+        elif self.money_distribution_type == 1:
             assets = self.uniform_asset_distribution(self.money_distribution_params['low'], self.money_distribution_params['high'])
-        elif self.money_distrubtion_type == 2:
+        elif self.money_distribution_type == 2:
             assets = self.expo_asset_distribution(self.money_distribution_params['scale'])
-        elif self.money_distrubtion_type == 3:
+        elif self.money_distribution_type == 3:
             assets = [self.money_distribution_params['constant']] * self.n_managers
         return assets
+
+    def get_earnings(self):
+        '''
+        Return a list of n_managers length containing different earnings for the managers depending on earnings_distribution_type
+        '''
+        if self.earnings_distribution_type == 0:
+            earnings = self.normal_asset_distribution(self.earnings_distribution_params['mu'],
+                                                    self.earnings_distribution_params['sigma'])
+        elif self.earnings_distribution_type == 1:
+            earnings = self.uniform_asset_distribution(self.earnings_distribution_params['low'],
+                                                     self.earnings_distribution_params['high'])
+        elif self.earnings_distribution_type == 2:
+            earnings = self.expo_asset_distribution(self.earnings_distribution_params['scale'])
+        elif self.earnings_distribution_type == 3:
+            earnings = [self.money_distribution_params['constant']] * self.n_managers
+        return earnings
 
 
     def normal_asset_distribution(self, mu, sigma):
