@@ -28,6 +28,8 @@ class Player(Agent):
         self.manager = None
         # In the field or a substitute player
         self.active = None
+        # Which position player is currently playing
+        self.position = None
 
     def step(self):
         """
@@ -45,4 +47,9 @@ class Player(Agent):
             if manager.reputation > highest_rep:
                 highest_rep_manager = manager
 
-        self.manager = highest_rep_manager
+        if highest_rep_manager != self.manager:
+            # Leave previous team
+            self.manager.team[self.position] = None
+            self.position = None
+            # Join new team
+            self.manager = highest_rep_manager

@@ -99,8 +99,6 @@ class FIFA_Simulation(Model):
 
     def init_managers(self):
         assets = self.get_assets()
-        #seting
-        j = 0
         for i in range(self.n_managers):
 
             strategy = self.strategies[i % len(self.strategies)]

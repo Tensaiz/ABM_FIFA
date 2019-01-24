@@ -7,9 +7,11 @@ class ManagerStrategy(object):
     def getAssemblyStrategy(self, currentManager):
         raise NotImplementedError()
 
-    def getTradeStrategy(self, currentManager):
+    def executeTradeStrategy(self, currentManager):
         raise NotImplementedError()
 
+    def executeRecoveryStrategy(self, currentManager):
+        raise NotImplementedError()
 
 class ExampleStrategy(ManagerStrategy):
 
@@ -37,10 +39,13 @@ class ExampleStrategy(ManagerStrategy):
         strategy['sub_keeper'] = total
         return strategy
 
-    def getTradeStrategy(self, currentManager):
+    def executeTradeStrategy(self, currentManager):
         # use the same strategy as in Assembly
         return self.getAssemblyStrategy(currentManager)
 
+    def executeRecoveryStrategy(self, currentManager):
+        # use the same strategy as in Assembly
+        return self.getAssemblyStrategy(currentManager)
 
 class EvenStrategy(ManagerStrategy):
 
@@ -62,8 +67,7 @@ class EvenStrategy(ManagerStrategy):
             strategy['sub_player_' + str(i + 1)] = money
         return strategy
 
-    def getTradeStrategy(self, currentManager):
-
+    def executeTradeStrategy(self, currentManager):
         pass
 
 class StrategyA(ManagerStrategy):
@@ -71,7 +75,7 @@ class StrategyA(ManagerStrategy):
     def getAssemblyStrategy(self, currentManager):
         pass
 
-    def getTradeStrategy(self, currentManager):
+    def executeTradeStrategy(self, currentManager):
         n_players_to_fire = 0
 	    lower_boundary_wins = 0.3
         middle_boundary_wins = 0.6
@@ -83,15 +87,31 @@ class StrategyA(ManagerStrategy):
             #wait make sure that you don't randomly fire sb you just hired. \
             # so just get the full list of ppl to replace
         current_team_members = currentManager.team.keys()
-        players_to_fire = []
+        positions_to_fire = []
         for i in range(n_players_to_fire):
-            players_to_fire.append(random.choice(current_team_members))# did I really access player objects by position keys?
-        for pos in players_to_fire:
-            pos.manager = None          
+            positions_to_fire.append(random.choice(current_team_members))  # are these 'position type' + str(i)?
+        for pos in positions_to_fire:  
+            player_to_fire = team[pos]
+            player_to_fire.manager = None           
             currentManager.team[pos] = None 
-            team_ranking_last_season = sorted(model.managers, key=lambda manager: manager.game_history[-34:]count(1), reverse=True)
-            for i-th in team_ranking_last_season:
-                i-th.managers..........
+            teams_ranking_last_season = sorted(model.managers, key=lambda manager: manager.game_history[-34:]count(1), reverse=True)
+            own_ranking_place = teams_ranking_last_season.index(currentManager)
+            for team in teams_ranking_last_season[:own_ranking_place-1]: 
+                positions = team.keys()
+                candidates = []
+                for position in positions:
+                    if pos == position:
+                        candidates.append(position)
+                        potential_candidate = random.choice(candidates)
+                        if offer_accepted_by(potential_candidate):   # function not existent yet
+                            break 
+                        else:
+                            candidates.remove(potential_candidate)
+                            potential_candidate = random.choice(candidates)
+ 
+                # if found a replacer in a team then exit this loop and move to next player
+
+                # if that ^ fails, buy free player with available remaining money and stop firing 
 
                  
 
@@ -99,3 +119,5 @@ class StrategyA(ManagerStrategy):
         
 
 
+    def executeRecoveryStrategy(self, currentManager):
+        pass

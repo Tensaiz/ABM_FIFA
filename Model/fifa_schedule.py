@@ -19,6 +19,7 @@ class RandomActivationFIFA(RandomActivation):
     def __init__(self, model):
         super().__init__(model)
         self.managers = []
+        self.incomplete_teams = []
         self.players = []
 
     def add_agent(self, agent):
@@ -49,6 +50,14 @@ class RandomActivationFIFA(RandomActivation):
         for player in self.players:
             player.step()
 
+        self.get_incomplete_teams()
+        self.shuffle_agents()
+
+        for manager in set(self.incomplete_teams):
+            manager.recovery_step()
+
+        self.incomplete_teams = []
+
         self.increment_time()
 
 
@@ -77,6 +86,15 @@ class RandomActivationFIFA(RandomActivation):
             # Tie
             manager_1.game_history.append(2)
             manager_2.game_history.append(2)
+
+    def get_incomplete_teams(self):
+        for manager in self.managers:
+            incomplete = False
+            for _, player in manager.team.items():
+                if player == None:
+                    incomplete = True
+            if incomplete:
+                self.incomplete_teams.append(manager)
 
     def shuffle_agents(self):
         random.shuffle(self.managers)
