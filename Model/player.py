@@ -24,6 +24,7 @@ class Player(Agent):
         super().__init__(name, model)
         self.name = name
         self.stats = stats
+        # offers is a list that contains tuples of (manager, position) format
         self.offers = []
         self.manager = None
         # In the field or a substitute player
