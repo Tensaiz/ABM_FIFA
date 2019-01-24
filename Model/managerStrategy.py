@@ -1,6 +1,5 @@
 class ManagerStrategy(object):
 
-
     def __init__(self, model = None):
         self.model = model 
 
@@ -13,8 +12,8 @@ class ManagerStrategy(object):
     def executeRecoveryStrategy(self, currentManager):
         raise NotImplementedError()
 
-class ExampleStrategy(ManagerStrategy):
 
+class ExampleStrategy(ManagerStrategy):
 
     def getAssemblyStrategy(self, currentManager):
         #expenentialy distributed assets over players
@@ -46,6 +45,7 @@ class ExampleStrategy(ManagerStrategy):
     def executeRecoveryStrategy(self, currentManager):
         # use the same strategy as in Assembly
         return self.getAssemblyStrategy(currentManager)
+
 
 class EvenStrategy(ManagerStrategy):
 
@@ -103,21 +103,38 @@ class StrategyA(ManagerStrategy):
                     if pos == position:
                         candidates.append(position)
                         potential_candidate = random.choice(candidates)
-                        if offer_accepted_by(potential_candidate):   # function not existent yet
+                        if offer_accepted_by(team[potential_candidate]):   # function not existent yet
+                            team[potential_candidate].manager = currentManager
+                            currentManager.team[pos] = team[potential_candidate]
                             break 
                         else:
                             candidates.remove(potential_candidate)
                             potential_candidate = random.choice(candidates)
- 
-                # if found a replacer in a team then exit this loop and move to next player
-
-                # if that ^ fails, buy free player with available remaining money and stop firing 
+                            if offer_accepted_by(potential_candidate):
+                                team[potential_candidate].manager = currentManager
+                                currentManager.team[pos] = team[potential_candidate]
+                                break
+            for backup_candidates in free_players:
+                
+            # if that ^ fails, buy free player with available remaining money and stop firing 
 
                  
 
 
         
 
+
+    def executeRecoveryStrategy(self, currentManager):
+        pass
+
+
+class BestPlayerStrategy(ManagerStrategy):
+
+    def getAssemblyStrategy(self, currentManager):
+        pass
+
+    def executeTradeStrategy(self, currentManager):
+        pass
 
     def executeRecoveryStrategy(self, currentManager):
         pass
