@@ -37,27 +37,19 @@ class Player(Agent):
         Takes offers into account after season finishes. The (first) manager with the highest reputation is
         chosen by the player.
         """
+        highest_offer = None
+
         if self.manager is None:
-            highest_rep_manager = None
             highest_rep = 0
+
         else:
-            highest_rep_manager = self.manager
             highest_rep = self.manager.reputation
 
-        for manager, pos in self.offers:
-            if manager.reputation > highest_rep:
-                highest_rep_manager = manager
-                position = pos
+        for offer in self.offers:
+            if offer.manager.reputation > highest_rep:
+                highest_offer = offer
 
-        if highest_rep_manager != self.manager:
-            # Leave previous team
-            self.manager.team[self.position] = None
-            # Join new team
-            self.manager.assets += self.stats['Release Clause']
-
-            self.position = position
-            self.manager = highest_rep_manager
-            self.manager.assets -= self.stats['Release Clause']
-            self.manager.team[position] = self
+        if highest_offer is not None:
+            highest_offer.accept()
 
         self.offers = []

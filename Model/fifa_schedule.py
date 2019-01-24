@@ -5,7 +5,7 @@ from manager import Manager
 from utility import match_outcome
 
 class RandomActivationFIFA(RandomActivation):
-    '''
+    """"
     The scheduler for the FIFA simulation ABM
     It schedules the activation of the manager and the players
 
@@ -15,7 +15,7 @@ class RandomActivationFIFA(RandomActivation):
 
     TODO:
         - Incorporate aging
-    '''
+    """
     def __init__(self, model):
         super().__init__(model)
         self.managers = []

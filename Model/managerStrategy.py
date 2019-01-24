@@ -1,6 +1,5 @@
 class ManagerStrategy(object):
 
-
     def __init__(self, model = None):
         self.model = model
 
@@ -109,7 +108,6 @@ class ManagerStrategy(object):
 
 class ExampleStrategy(ManagerStrategy):
 
-
     def getAssemblyStrategy(self, currentManager):
         #expenentialy distributed assets over players
         total = currentManager.assets
@@ -140,6 +138,7 @@ class ExampleStrategy(ManagerStrategy):
     def executeRecoveryStrategy(self, currentManager):
         # use the same strategy as in Assembly
         return self.getAssemblyStrategy(currentManager)
+
 
 class EvenStrategy(ManagerStrategy):
 
@@ -237,6 +236,8 @@ class EvenStrategy(ManagerStrategy):
 
 class SimpleStrategy(ManagerStrategy):
     '''
+    HAS TO BE REWRITTEN TO TAKE INTO ACCOUNT NEW OFFER CLASS
+
     Spread money evenly for team assembly,
     Trade step: Every season swap your worst player for the best possible player you can buy
     Recovery step: Buy the best player you can for the missing positions
@@ -331,7 +332,13 @@ class SimpleStrategy(ManagerStrategy):
             player_agent.position = pos
 
 
+class BestPlayerStrategy(ManagerStrategy):
 
+    def getAssemblyStrategy(self, currentManager):
+        pass
 
+    def executeTradeStrategy(self, currentManager):
+        pass
 
-
+    def executeRecoveryStrategy(self, currentManager):
+        pass

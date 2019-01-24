@@ -94,7 +94,7 @@ class Manager(Agent):
         ]
     }
 
-    def __init__(self, name, model, assets, reputation, strategy, team_type=0):
+    def __init__(self, name, model, assets, earnings, reputation, strategy, team_type=0):
         super().__init__(name, model)
         self.name = name
         self.starting_assets = assets
@@ -109,6 +109,8 @@ class Manager(Agent):
 
         self.strategy = strategy
         self.assemble_strategy = self.strategy.getAssemblyStrategy(self)
+
+        self.accepted = []
 
         # Keep track of past match results
         self.game_history = []
