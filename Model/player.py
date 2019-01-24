@@ -24,6 +24,7 @@ class Player(Agent):
         super().__init__(name, model)
         self.name = name
         self.stats = stats
+        # offers is a list that contains tuples of (manager, position) format
         self.offers = []
         self.manager = None
         # In the field or a substitute player
@@ -43,13 +44,20 @@ class Player(Agent):
             highest_rep_manager = self.manager
             highest_rep = self.manager.reputation
 
-        for manager in self.offers:
+        for manager, pos in self.offers:
             if manager.reputation > highest_rep:
                 highest_rep_manager = manager
+                position = pos
 
         if highest_rep_manager != self.manager:
             # Leave previous team
             self.manager.team[self.position] = None
-            self.position = None
             # Join new team
+            self.manager.assets += self.stats['Release Clause']
+
+            self.position = position
             self.manager = highest_rep_manager
+            self.manager.assets -= self.stats['Release Clause']
+            self.manager.team[position] = self
+
+        self.offers = []
