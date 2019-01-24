@@ -110,6 +110,8 @@ class Manager(Agent):
         self.strategy = strategy
         self.assemble_strategy = self.strategy.getAssemblyStrategy(self)
 
+        self.accepted = []
+
         # Keep track of past match results
         self.game_history = []
 
@@ -163,12 +165,10 @@ class Manager(Agent):
             return possibilities.iloc[(possibilities['Release Clause'] - money_available_for_pos).abs().argsort()]
 
     def step(self):
-        for offer in self.strategy.executeTradeStrategy(self):
-            offer.execute()
+        self.strategy.executeTradeStrategy(self)
 
     def recovery_step(self):
-        for offer in self.strategy.executeRecoveryStrategy(self):
-            offer.execute()
+        self.strategy.executeRecoveryStrategy(self)
 
     def init_empty_team(self):
         self.team = {
