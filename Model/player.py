@@ -50,3 +50,5 @@ class Player(Agent):
 
         if highest_offer is not None:
             highest_offer.accept()
+
+        self.offers = []
