@@ -163,10 +163,12 @@ class Manager(Agent):
             return possibilities.iloc[(possibilities['Release Clause'] - money_available_for_pos).abs().argsort()]
 
     def step(self):
-        self.strategy.executeTradeStrategy(self)
+        for offer in self.strategy.executeTradeStrategy(self):
+            offer.execute()
 
     def recovery_step(self):
-        self.strategy.executeRecoveryStrategy(self)
+        for offer in self.strategy.executeRecoveryStrategy(self):
+            offer.execute()
 
     def init_empty_team(self):
         self.team = {
