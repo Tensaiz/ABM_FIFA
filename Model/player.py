@@ -14,12 +14,8 @@ class Player(Agent):
         name (str): Actual name of the soccer player
         model (:obj: model): The top-level ABM model
         stats (:list: str or int): the different stats of the player
-
-    TODO:
-        Needs a step function to determine what the player does every action,
-        for the first few steps it should be considering between open invitations to teams (when teams are assembled)
-        Afterwards it should choose between new teams if he is invited by a manager
     """
+
     def __init__(self, name, model, stats):
         super().__init__(name, model)
         self.name = name
@@ -53,3 +49,4 @@ class Player(Agent):
             self.position = None
             # Join new team
             self.manager = highest_rep_manager
+        self.manager = highest_rep_manager
