@@ -8,9 +8,11 @@ class ManagerStrategy(object):
     def getAssemblyStrategy(self, currentManager):
         raise NotImplementedError()
 
-    def getTradeStrategy(self, currentManager):
+    def executeTradeStrategy(self, currentManager):
         raise NotImplementedError()
 
+    def executeRecoveryStrategy(self, currentManager):
+        raise NotImplementedError()
 
 class ExampleStrategy(ManagerStrategy):
 
@@ -38,10 +40,13 @@ class ExampleStrategy(ManagerStrategy):
         strategy['sub_keeper'] = total
         return strategy
 
-    def getTradeStrategy(self, currentManager):
+    def executeTradeStrategy(self, currentManager):
         # use the same strategy as in Assembly
         return self.getAssemblyStrategy(currentManager)
 
+    def executeRecoveryStrategy(self, currentManager):
+        # use the same strategy as in Assembly
+        return self.getAssemblyStrategy(currentManager)
 
 class EvenStrategy(ManagerStrategy):
 
@@ -63,6 +68,8 @@ class EvenStrategy(ManagerStrategy):
             strategy['sub_player_' + str(i + 1)] = money
         return strategy
 
-    def getTradeStrategy(self, currentManager):
+    def executeTradeStrategy(self, currentManager):
+        pass
 
+    def executeRecoveryStrategy(self, currentManager):
         pass
