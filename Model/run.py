@@ -6,14 +6,14 @@ def run_FIFA_model():
     FIFA_data = pd.read_csv('../data.csv')
 
     assemble_rounds = 1
-    seasons = 10
+    seasons = 15
     # Amount of managers is 18 * n_pools
     n_pools = 1
     n_players = 0
     player_stats = FIFA_data
     money_distribution_type = 0
     money_distribution_params = {'mu': 25000000, 'sigma':2500000}
-    strategies = [managerStrategy.EvenStrategy()]
+    strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy()]
 
     verbose = True
 

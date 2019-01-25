@@ -17,12 +17,6 @@ class Manager(Agent):
         assemble_strategy (int): The strategy used to assemble the initial team
         trade_strategy (int): The strategy used to progress by buying and trading players
 
-
-    TODO:
-        Create trading mechanism between manager agents
-        Create team trading mechanics
-        Create different optimisation strategies to assemble a team
-        Add Strategy design pattern for manager strategies
     """
 
     TEAM_SIZE = 18
@@ -99,6 +93,7 @@ class Manager(Agent):
         self.name = name
         self.starting_assets = assets
         self.assets = assets
+        self.earnings = earnings
         self.reputation = reputation
 
         # 1 keeper, 4 defenders, 3 midfielders, 3 attackers

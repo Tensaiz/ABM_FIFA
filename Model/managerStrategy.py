@@ -1,3 +1,5 @@
+from offer import Offer
+
 class ManagerStrategy(object):
 
     def __init__(self, model = None):
@@ -85,7 +87,6 @@ class ManagerStrategy(object):
         '''
         Return a list with possible players for a position and a certain amount of money
         '''
-        print(pos)
         # List of players that have the same release clause as the money the manager wants to spend for the position
         suitable_players = self.model.chosen_player_stats[self.model.chosen_player_stats['Release Clause'] == money]
         if pos.split('_')[0] != 'sub':
@@ -105,6 +106,31 @@ class ManagerStrategy(object):
         manager.team[position] = None
         player.position = None
         player.manager = None
+
+    def buy_free_player(self, manager, pos, money):
+        attempt = 0
+        possible_players = self.pick_player(pos, money)
+        chosen_player = possible_players.iloc[attempt]
+        # Might have to catch a key error if the player isn't in the dictionary here
+        player_agent = self.model.player_lookup[chosen_player['Name']]
+        if player_agent.manager != None:
+            player_agent = None
+        while (player_agent == None):
+            chosen_player = possible_players.iloc[attempt]
+            # Might have to catch a key error if the player isn't in the dictionary here
+            player_agent = self.model.player_lookup[chosen_player['Name']]
+            if player_agent.manager != None:
+                player_agent = None
+            attempt += 1
+        # Buy player
+        manager.team[pos] = player_agent
+        manager.assets -= chosen_player['Release Clause']
+        if pos[0:3] == 'sub':
+            player_agent.active = False
+        else:
+            player_agent.active = True
+        player_agent.manager = manager
+        player_agent.position = pos
 
 class ExampleStrategy(ManagerStrategy):
 
@@ -236,8 +262,6 @@ class EvenStrategy(ManagerStrategy):
 
 class SimpleStrategy(ManagerStrategy):
     '''
-    HAS TO BE REWRITTEN TO TAKE INTO ACCOUNT NEW OFFER CLASS
-
     Spread money evenly for team assembly,
     Trade step: Every season swap your worst player for the best possible player you can buy
     Recovery step: Buy the best player you can for the missing positions
@@ -270,66 +294,57 @@ class SimpleStrategy(ManagerStrategy):
         for pos, player in currentManager.team.items():
             if player.stats['Overall'] < overall:
                 worst_player = player
-        print(worst_player)
-        print(worst_player.position)
-        # Let him go
+                overall = worst_player.stats['Overall']
         position = worst_player.position
-        self.kick_player(currentManager, worst_player, position)
-        print('Buy / send: ' + position)
-        # Buy or send offer to best player you can buy that will accept your offer
-        possible_players = self.pick_player(position, currentManager.assets)
-        chosen_player = possible_players.iloc[0]
-        # Might have to catch a key error if the player isn't in the dictionary here
-        player_agent = self.model.player_lookup[chosen_player['Name']]
-        if player_agent.manager != None:
-            # Send offer to player
-            player_agent.offers.append((currentManager, position))
-        else:
-            # Buy player
-            currentManager.team[pos] = player_agent
-            player_agent.position = pos
-            currentManager.assets -= chosen_player['Release Clause']
-            if pos[0:3] == 'sub':
-                player_agent.active = False
-            else:
-                player_agent.active = True
-            player_agent.manager = currentManager
-            player_agent.position = pos
 
-    def executeRecoveryStrategy(self, currentManager):
-        # Get open positions
-        to_buy = []
-        for pos, player in currentManager.team.items():
-            if player == None:
-                to_buy.append(pos)
-        print('Recovery for manager: ' + str(currentManager.name))
-        print('positions: ' + str(to_buy))
-        for pos in to_buy:
-            attempt = 0
-            # Buy best player you can buy that will accept your offer
-            print(pos)
-            possible_players = self.pick_player(pos, currentManager.assets / len(to_buy))
-            chosen_player = possible_players.iloc[attempt]
-            # Might have to catch a key error if the player isn't in the dictionary here
-            player_agent = self.model.player_lookup[chosen_player['Name']]
-            if player_agent.manager != None:
-                player_agent = None
-            while (player_agent == None):
-                chosen_player = possible_players.iloc[attempt]
+        # Buy or send offer to best player you can buy
+        possible_players = self.pick_player(position, currentManager.assets)
+        if len(possible_players > 0):
+            chosen_player = possible_players.iloc[0]
+            if (chosen_player['Overall'] > worst_player.stats['Overall']):
                 # Might have to catch a key error if the player isn't in the dictionary here
                 player_agent = self.model.player_lookup[chosen_player['Name']]
-                if player_agent.manager != None:
-                    player_agent = None
-                attempt += 1
-            # Buy player
-            currentManager.team[pos] = player_agent
-            currentManager.assets -= chosen_player['Release Clause']
-            if pos[0:3] == 'sub':
-                player_agent.active = False
-            else:
-                player_agent.active = True
-            player_agent.manager = currentManager
-            player_agent.position = pos
+                # Send offer to the player
+                Offer(currentManager, player_agent, position)
+
+    def executeRecoveryStrategy(self, currentManager):
+        # Get empty positions
+        empty_postions = []
+        for pos, player in currentManager.team.items():
+            if player == None:
+                empty_postions.append(pos)
+
+        for pos in empty_postions:
+            # Check if you can fill an empty position with a player that accepted your offer
+            filled = False
+            for player in currentManager.accepted:
+                if player.position == pos:
+                    # Assign player to empty position
+                    currentManager.team[pos] = player
+                    if pos[0:3] == 'sub':
+                        player.active = False
+                    else:
+                        player.active = True
+                    filled = True
+                    currentManager.accepted.remove(player)
+                    break
+            if filled:
+                empty_postions.remove(pos)
+                continue
+
+            # Otherwise buy a new player to fill the position that will accept your offer
+            money = currentManager.assets / len(empty_postions)
+            self.buy_free_player(currentManager, pos, money)
+
+        # Now choose between left over players that accepted your offer
+        for player in currentManager.accepted:
+            position = player.position
+            replaceable_player = currentManager.team[position]
+            self.kick_player(currentManager, replaceable_player, position)
+            currentManager.team[position] = player
+
+        currentManager.accepted = []
+
 
 
 class BestPlayerStrategy(ManagerStrategy):
