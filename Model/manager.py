@@ -185,3 +185,8 @@ class Manager(Agent):
         self.team['sub_keeper'] = None
         for i in range(6):
             self.team['sub_player_' + str(i + 1)] = None
+
+    def fire_player(position_key):
+        player_to_fire = self.team[position_key]
+        player_to_fire.manager = None           
+        self.team[position_key] = None 
