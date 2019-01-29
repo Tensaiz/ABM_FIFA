@@ -88,19 +88,19 @@ class Manager(Agent):
         ]
     }
 
-    def __init__(self, name, model, assets, earnings, reputation, strategy, team_type=0):
+    def __init__(self, name, model, assets, earnings_ratio, reputation, strategy, team_type=0):
         super().__init__(name, model)
         self.name = name
         self.starting_assets = assets
         self.assets = assets
-        self.earnings = earnings
+        self.earnings_ratio = earnings_ratio
         self.reputation = reputation
+        self.earnings = assets * earnings_ratio
 
         # 1 keeper, 4 defenders, 3 midfielders, 3 attackers
         # + 1 keeper sub and 6 sub players
         self.team_type = team_type
         self.init_empty_team()
-
 
         self.strategy = strategy
         self.assemble_strategy = self.strategy.getAssemblyStrategy(self)
@@ -161,6 +161,7 @@ class Manager(Agent):
 
     def step(self):
         self.strategy.executeTradeStrategy(self)
+        self.earnings = self.assets * self.earnings_ratio
 
     def recovery_step(self):
         self.strategy.executeRecoveryStrategy(self)

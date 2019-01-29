@@ -35,7 +35,7 @@ class FIFA_Simulation(Model):
         strategies (:list:`int`): A list with the different strategies
     """
 
-    def __init__(self, assemble_rounds, seasons, n_pools, n_players, player_stats, money_distribution_type, money_distribution_params, strategies, verbose=True):
+    def __init__(self, assemble_rounds, seasons, n_pools, n_players, player_stats, money_distribution_type, money_distribution_params, earnings_ratio, strategies, verbose=True):
         self.verbose = verbose
         # Properties
         self.assemble_rounds = assemble_rounds
@@ -46,8 +46,7 @@ class FIFA_Simulation(Model):
         self.player_stats = self.transform_fifa(player_stats)
         self.money_distribution_type = money_distribution_type
         self.money_distribution_params = money_distribution_params
-        self.earnings_distribution_type = money_distribution_type
-        self.earnings_distribution_params = self.get_earning_params()
+        self.earnings_ratio = earnings_ratio
         self.strategies = strategies
 
         self.managers = []
@@ -101,14 +100,13 @@ class FIFA_Simulation(Model):
 
     def init_managers(self):
         assets = self.get_assets()
-        earnings = self.get_earnings()
         for i in range(self.n_managers):
 
             strategy = self.strategies[i % len(self.strategies)]
             strategy.model = self # Some strategies need access to model
             # Then they are able to make better decisions
 
-            m = Manager(i, self, assets[i], earnings[i], 0, strategy, 0)
+            m = Manager(i, self, assets[i], self.earnings_ratio, 0, strategy, 0)
             self.managers.append(m)
             self.schedule.add_agent(m)
 
@@ -126,27 +124,6 @@ class FIFA_Simulation(Model):
             assets = [self.money_distribution_params['constant']] * self.n_managers
         return assets
 
-    def get_earnings(self):
-        '''
-        Return a list of n_managers length containing different earnings for the managers depending on earnings_distribution_type
-        '''
-        if self.earnings_distribution_type == 0:
-            earnings = self.normal_asset_distribution(self.earnings_distribution_params['mu'],
-                                                    self.earnings_distribution_params['sigma'])
-        elif self.earnings_distribution_type == 1:
-            earnings = self.uniform_asset_distribution(self.earnings_distribution_params['low'],
-                                                     self.earnings_distribution_params['high'])
-        elif self.earnings_distribution_type == 2:
-            earnings = self.expo_asset_distribution(self.earnings_distribution_params['scale'])
-        elif self.earnings_distribution_type == 3:
-            earnings = [self.money_distribution_params['constant']] * self.n_managers
-        return earnings
-
-    def get_earning_params(self):
-        earning_params = {}
-        for key, val in self.money_distribution_params.items():
-            earning_params[key] = val * (1/3)
-        return earning_params
 
     def normal_asset_distribution(self, mu, sigma):
         '''
@@ -192,7 +169,7 @@ class FIFA_Simulation(Model):
 
         results = sorted(self.managers, key=lambda manager: manager.game_history.count(1), reverse=True)
         for i, manager in enumerate(results):
-            print('Manager ' + str(manager.name) + ' finished ' + str(i) + 'th place and used strategy: ' + type(manager.strategy).__name__ + '\n')
+            print('Manager ' + str(manager.name) + ' finished ' + str(i + 1) + 'th place and used strategy: ' + type(manager.strategy).__name__ + '\n')
 
     def run(self):
         """
