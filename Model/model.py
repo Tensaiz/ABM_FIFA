@@ -47,8 +47,7 @@ class FIFA_Simulation(Model):
         self.money_distribution_type = money_distribution_type
         self.money_distribution_params = money_distribution_params
         self.earnings_distribution_type = money_distribution_type
-        self.earnings_distribution_params = money_distribution_params((money_distribution_params.key(),
-                                                                       [x / 10 for x in money_distribution_params.values()]))
+        self.earnings_distribution_params = self.get_earning_params()
         self.strategies = strategies
 
         self.managers = []
@@ -143,6 +142,11 @@ class FIFA_Simulation(Model):
             earnings = [self.money_distribution_params['constant']] * self.n_managers
         return earnings
 
+    def get_earning_params(self):
+        earning_params = {}
+        for key, val in self.money_distribution_params.items():
+            earning_params[key] = val * (1/3)
+        return earning_params
 
     def normal_asset_distribution(self, mu, sigma):
         '''
@@ -183,7 +187,12 @@ class FIFA_Simulation(Model):
     def print_results(self):
         print('Win / loss overview per manager after ' + str(self.seasons) +' seasons:')
         for manager in self.managers:
-            print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + ' and has ' + str(manager.game_history.count(1)) + ' wins and ' + str(manager.game_history.count(0)) + ' losses.')
+            print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + '\nHas ' + str(manager.game_history.count(1)) + ' wins and ' + str(manager.game_history.count(0)) + ' losses.')
+            print('Has ' + str(manager.assets) + ' funds remaining and used ' + type(manager.strategy).__name__ + '\n')
+
+        results = sorted(self.managers, key=lambda manager: manager.game_history.count(1), reverse=True)
+        for i, manager in enumerate(results):
+            print('Manager ' + str(manager.name) + ' finished ' + str(i) + 'th place and used strategy: ' + type(manager.strategy).__name__ + '\n')
 
     def run(self):
         """

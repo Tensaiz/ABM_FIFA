@@ -55,6 +55,7 @@ class RandomActivationFIFA(RandomActivation):
 
         for manager in set(self.incomplete_teams):
             manager.recovery_step()
+            manager.assets += manager.earnings
 
         self.incomplete_teams = []
 
@@ -77,11 +78,15 @@ class RandomActivationFIFA(RandomActivation):
         if outcome == 0:
             # Manager one won
             manager_1.game_history.append(0)
+            manager_1.reputation += 1
             manager_2.game_history.append(1)
+            manager_2.reputation -= 1
         elif outcome == 1:
             # Manager two won
             manager_1.game_history.append(1)
+            manager_1.reputation -= 1
             manager_2.game_history.append(0)
+            manager_2.reputation += 1
         elif outcome == 2:
             # Tie
             manager_1.game_history.append(2)

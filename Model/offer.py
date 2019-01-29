@@ -5,12 +5,13 @@ class Offer(object):
         self.player = player
         self.position = position
 
-        self.player.offers.apeend(self)
+        self.player.offers.append(self)
 
     def accept(self):
-        # Update Players Manager, remove him
-        self.player.manager.team[self.player.position] = None
-        self.player.manager.assets += self.player.stats['Release Clause']
+        if self.player.manager != None:
+            # Update Players Manager, remove him
+            self.player.manager.team[self.player.position] = None
+            self.player.manager.assets += self.player.stats['Release Clause']
 
         # Update player and new manager
         self.player.position = self.position
