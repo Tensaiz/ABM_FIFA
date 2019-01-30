@@ -46,14 +46,15 @@ class RandomActivationFIFA(RandomActivation):
 
         for manager in self.managers:
             manager.step()
-        
+            manager.assets += manager.earnings
+
         for player in self.players:
             player.step()
 
         self.get_incomplete_teams()
         self.shuffle_agents()
 
-        for manager in set(self.incomplete_teams):
+        for manager in set(self.managers):
             manager.recovery_step()
             manager.assets += manager.earnings
 
