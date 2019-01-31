@@ -37,7 +37,7 @@ class FIFA_Simulation(Model):
     """
 
     def __init__(self, assemble_rounds = 1, seasons = 15, n_pools = 1, n_players = 0, 
-                 player_stats = pd.read_csv('C:/Users/Kasper/ABM_FIFA/data.csv'), money_distribution_type = 0, 
+                 player_stats = pd.read_csv('.../data.csv'), money_distribution_type = 0, 
                  mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=True,
                  strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy()]):
 
