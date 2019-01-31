@@ -122,6 +122,6 @@ class RandomActivationFIFA(RandomActivation):
         manager_rep = []
 
         for m in self.managers:
-            manager_assets.append(m.reputation)
+            manager_rep.append(m.reputation)
 
         return manager_rep
