@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import time
 
 # mesa
@@ -35,9 +36,16 @@ class FIFA_Simulation(Model):
         strategies (:list:`int`): A list with the different strategies
     """
 
-    def __init__(self, assemble_rounds, seasons, n_pools, n_players, player_stats, money_distribution_type, mu, sigma, earnings_ratio, strategies, verbose=True):
+    def __init__(self, assemble_rounds = 1, seasons = 15, n_pools = 1, n_players = 0, 
+                 player_stats = pd.read_csv('C:/Users/Kasper/ABM_FIFA/data.csv'), money_distribution_type = 0, 
+                 mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=True,
+                 strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy()]):
+
         self.verbose = verbose
-        # Properties
+        # Set parameters
+        self.money_distribution_params = {'mu': mu, 'sigma': sigma}
+        self.earnings_ratio = earnings_ratio
+
         self.assemble_rounds = assemble_rounds
         self.seasons = seasons
         self.n_pools = n_pools
@@ -45,8 +53,6 @@ class FIFA_Simulation(Model):
         self.n_players = n_players
         self.player_stats = self.transform_fifa(player_stats)
         self.money_distribution_type = money_distribution_type
-        self.money_distribution_params = {'mu': mu, 'sigma': sigma}
-        self.earnings_ratio = earnings_ratio
         self.strategies = strategies
 
         self.managers = []
@@ -56,6 +62,9 @@ class FIFA_Simulation(Model):
         self.player_lookup = {}
 
         self.schedule = RandomActivationFIFA(self)
+        self.datacollector = DataCollector(
+            {"Manager assets": lambda m: m.schedule.get_manager_assets(),
+             "Manager reputation": lambda m: m.schedule.get_manager_reputation()})
 
         # Initialization functions
         self.init_agents()

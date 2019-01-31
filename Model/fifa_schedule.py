@@ -109,3 +109,19 @@ class RandomActivationFIFA(RandomActivation):
     def increment_time(self):
         self.steps += 1
         self.time += 1
+
+    def get_manager_assets(self):
+        manager_assets = []
+
+        for m in self.managers:
+            manager_assets.append(m.assets)
+
+        return manager_assets
+
+    def get_manager_reputation(self):
+        manager_rep = []
+
+        for m in self.managers:
+            manager_assets.append(m.reputation)
+
+        return manager_rep
