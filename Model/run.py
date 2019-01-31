@@ -3,7 +3,7 @@ import managerStrategy
 from model import FIFA_Simulation
 
 def run_FIFA_model():
-    FIFA_data = pd.read_csv('.../data.csv')
+    FIFA_data = pd.read_csv('data.csv')
 
     assemble_rounds = 1
     seasons = 15
@@ -15,7 +15,7 @@ def run_FIFA_model():
     mu = 10^6
     sigma = 10^6
     earnings_ratio = (1/2)
-    strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy()]
+    strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy() , managerStrategy.UnforgivingStrategy()]
 
     verbose = True
 
