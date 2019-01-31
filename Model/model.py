@@ -65,6 +65,7 @@ class FIFA_Simulation(Model):
         self.datacollector = DataCollector(
             {"Manager assets": lambda m: m.schedule.get_manager_assets(),
              "Manager reputation": lambda m: m.schedule.get_manager_reputation()})
+        self.running = False
 
         # Initialization functions
         self.init_agents()
@@ -184,6 +185,7 @@ class FIFA_Simulation(Model):
         """
         Runs the model after initialization by first assembling the teams and then playing the matches
         """
+        self.running = True
         start_time = time.time()
         for _ in range(self.assemble_rounds):
             self.schedule.assemble_step()
@@ -196,5 +198,5 @@ class FIFA_Simulation(Model):
             self.schedule.step()
             self.datacollector.collect(self)
         print("Simulating seasons took --- %s seconds ---" % (time.time() - start_time))
-
+        self.running = False
         self.print_results()

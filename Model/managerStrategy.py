@@ -13,7 +13,7 @@ class ManagerStrategy(object):
         raise NotImplementedError()
 
     def executeRecoveryStrategy(self, currentManager):
-        #raise NotImplementedError()
+        raise NotImplementedError()
         print('Executing recovery strategy...')
 
     SPECIFIC_POSITION_DICT = {
@@ -189,6 +189,10 @@ class EvenStrategy(ManagerStrategy):
 
     def executeTradeStrategy(self, currentManager):
         pass
+
+    def executeRecoveryStrategy(self, currentManager):
+        pass
+
 
 class UnforgivingStrategy(ManagerStrategy):
 
