@@ -49,13 +49,12 @@ def get_average_age_team(manager):
     '''
     Calculate the average age of the team
     '''
-    sum_ages = 0 
-    current_team_size = 0     
-    for pos, player in manager.team.items():  
-        if player != None:
-            current_team_size += 1
-            sum_ages += player.stats['Age']        
-    return sum_ages / current_team_size       
+    sum_ages = 0      
+    positions = manager.team.keys()
+    for position in positions:
+        player = manager.team[position]       
+        sum_ages += player.stats['Age']           
+    return sum_ages / len(positions)        
      
 def market_value_win_probability(manager_1, manager_2):
     '''
@@ -73,8 +72,7 @@ def get_manager_market_value(manager):
     positions = manager.team.keys()
     for position in positions:
         player = manager.team[position]
-        if player != None:
-            market_value += player.stats['Value']
+        market_value += player.stats['Value']
     return market_value / len(positions)
 
 def get_draw(p_victory):
