@@ -35,7 +35,7 @@ class FIFA_Simulation(Model):
         strategies (:list:`int`): A list with the different strategies
     """
 
-    def __init__(self, assemble_rounds, seasons, n_pools, n_players, player_stats, money_distribution_type, money_distribution_params, earnings_ratio, strategies, verbose=True):
+    def __init__(self, assemble_rounds, seasons, n_pools, n_players, player_stats, money_distribution_type, mu, sigma, earnings_ratio, strategies, verbose=True):
         self.verbose = verbose
         # Properties
         self.assemble_rounds = assemble_rounds
@@ -45,7 +45,7 @@ class FIFA_Simulation(Model):
         self.n_players = n_players
         self.player_stats = self.transform_fifa(player_stats)
         self.money_distribution_type = money_distribution_type
-        self.money_distribution_params = money_distribution_params
+        self.money_distribution_params = {'mu': mu, 'sigma': sigma}
         self.earnings_ratio = earnings_ratio
         self.strategies = strategies
 
