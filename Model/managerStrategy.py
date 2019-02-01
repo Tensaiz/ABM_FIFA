@@ -307,7 +307,8 @@ class UnforgivingStrategy(ManagerStrategy):
             for player in currentManager.accepted:
                 position = player.position
                 replaceable_player = currentManager.team[position]
-                self.kick_player(currentManager, replaceable_player, position)
+                if replaceable_player:
+                    self.kick_player(currentManager, replaceable_player, position)
                 currentManager.team[position] = player
 
         currentManager.accepted = []
@@ -368,9 +369,10 @@ class SimpleStrategy(ManagerStrategy):
         worst_player = None
         overall = 100
         for pos, player in currentManager.team.items():
-            if player.stats['Overall'] < overall: # during one run got AttributeError: 'NoneType' object has no attribute 'stats'
-                worst_player = player
-                overall = worst_player.stats['Overall']
+            if player:
+                if player.stats['Overall'] < overall: # during one run got AttributeError: 'NoneType' object has no attribute 'stats'
+                    worst_player = player
+                    overall = worst_player.stats['Overall']
         position = worst_player.position
 
         # Buy or send offer to best player you can buy

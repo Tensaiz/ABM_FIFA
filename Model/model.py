@@ -42,7 +42,7 @@ class FIFA_Simulation(Model):
     def __init__(self, assemble_rounds = 1, seasons = 15, n_pools = 1, n_players = 0, 
                  player_stats_ = pd.read_csv('../data.csv'), money_distribution_type = 0,
                  mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=False, player_stats = None,
-                 strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy()]):
+                 strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy(), managerStrategy.UnforgivingStrategy()]):
 
 
         self.verbose = verbose
