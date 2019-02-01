@@ -11,6 +11,7 @@ from fifa_schedule import RandomActivationFIFA
 from player import Player
 from manager import Manager
 import managerStrategy
+import utility
 
 class FIFA_Simulation(Model):
     """
@@ -36,10 +37,13 @@ class FIFA_Simulation(Model):
         strategies (:list:`int`): A list with the different strategies
     """
 
+    player_stats = None
+
     def __init__(self, assemble_rounds = 1, seasons = 15, n_pools = 1, n_players = 0, 
-                 player_stats = pd.read_csv('../data.csv'), money_distribution_type = 0,
-                 mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=True,
-                 strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy()]):
+                 player_stats_ = pd.read_csv('../data.csv'), money_distribution_type = 0,
+                 mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=False, player_stats = None,
+                 strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy(), managerStrategy.UnforgivingStrategy()]):
+
 
         self.verbose = verbose
         # Set parameters
@@ -51,7 +55,10 @@ class FIFA_Simulation(Model):
         self.n_pools = n_pools
         self.n_managers = 18 * n_pools
         self.n_players = n_players
-        self.player_stats = self.transform_fifa(player_stats)
+
+        if FIFA_Simulation.player_stats is None:
+            FIFA_Simulation.player_stats = utility.transform_fifa(player_stats_)
+
         self.money_distribution_type = money_distribution_type
         self.strategies = strategies
 
@@ -65,40 +72,30 @@ class FIFA_Simulation(Model):
         self.datacollector = DataCollector(
             {"Manager assets": lambda m: m.schedule.get_manager_assets(),
              "Manager reputation": lambda m: m.schedule.get_manager_reputation()})
+        self.running = True
 
         # Initialization functions
         self.init_agents()
+        self.step_n = 0
+        # Collect first time
+        self.datacollector.collect(self)
 
-    def transform_fifa(self, player_stats):
-        start_time = time.time()
-        player_stats['Release Clause'] = player_stats['Release Clause'].apply(self.transform_to_number)
-        player_stats['Value'] = player_stats['Value'].apply(self.transform_to_number)
-        print("Transforming fifa data took --- %s seconds ---" % (time.time() - start_time))
-        return player_stats
 
-    def transform_to_number(self, release_clause):
-        if isinstance(release_clause, float):
-            return 0
-        elif release_clause == '€0':
-            return 0
-        elif release_clause[-1] == 'K':
-            multiplier = 1000
-        elif release_clause[-1] == 'M':
-            multiplier = 1000000
-        return float(release_clause[1:-1]) * multiplier
+
 
     def init_agents(self):
         start_time = time.time()
         self.init_players()
         self.init_managers()
-        print("Initializing agents took --- %s seconds ---" % (time.time() - start_time))
+        if self.verbose:
+            print("Initializing agents took --- %s seconds ---" % (time.time() - start_time))
 
     def init_players(self):
         if self.n_players == 0:
-            self.n_players = len(self.player_stats)
+            self.n_players = len(FIFA_Simulation.player_stats)
 
         # Randomly select n_players amount of players
-        self.chosen_player_stats = self.player_stats.sample(self.n_players)
+        self.chosen_player_stats = FIFA_Simulation.player_stats.sample(self.n_players)
 
         for i in range(self.n_players):
             p = Player(self.chosen_player_stats.iloc[i]['Name'], self, self.chosen_player_stats.iloc[i])
@@ -115,7 +112,7 @@ class FIFA_Simulation(Model):
             strategy.model = self # Some strategies need access to model
             # Then they are able to make better decisions
 
-            m = Manager(i, self, assets[i], self.earnings_ratio, 0, strategy, 0)
+            m = Manager(i, self, max(5000000, assets[i]), self.earnings_ratio, 0, strategy, 0)
             self.managers.append(m)
             self.schedule.add_agent(m)
 
@@ -173,21 +170,24 @@ class FIFA_Simulation(Model):
     def print_results(self):
         print('Win / loss overview per manager after ' + str(self.seasons) +' seasons:')
         for manager in self.managers:
-            print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + '\nHas ' + str(manager.game_history.count(1)) + ' wins and ' + str(manager.game_history.count(0)) + ' losses.')
+            print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + '\nHas ' + str(manager.game_history.count(0)) + ' wins and ' + str(manager.game_history.count(1)) + ' losses. Has ' + str(manager.reputation) + ' reputation.') 
             print('Has ' + str(manager.assets) + ' funds remaining and used ' + type(manager.strategy).__name__ + '\n')
 
-        results = sorted(self.managers, key=lambda manager: manager.game_history.count(1), reverse=True)
+        results = sorted(self.managers, key=lambda manager: manager.game_history.count(0), reverse=True)
         for i, manager in enumerate(results):
             print('Manager ' + str(manager.name) + ' finished ' + str(i + 1) + 'th place and used strategy: ' + type(manager.strategy).__name__ + '\n')
 
-    def run(self):
+    def run_model(self):
         """
         Runs the model after initialization by first assembling the teams and then playing the matches
         """
+        self.running = True
         start_time = time.time()
+
         for _ in range(self.assemble_rounds):
             self.schedule.assemble_step()
-        print("Assembling teams took --- %s seconds ---" % (time.time() - start_time))
+        if self.verbose:
+            print("Assembling teams took --- %s seconds ---" % (time.time() - start_time))
 
         self.create_pools()
 
@@ -195,6 +195,23 @@ class FIFA_Simulation(Model):
         for _ in range(self.seasons):
             self.schedule.step()
             self.datacollector.collect(self)
-        print("Simulating seasons took --- %s seconds ---" % (time.time() - start_time))
-
+        if self.verbose:
+            print("Simulating seasons took --- %s seconds ---" % (time.time() - start_time))
+        self.running = False
         self.print_results()
+
+    # Mesa required step function
+    def step(self):
+        if self.step_n < self.assemble_rounds:
+            self.schedule.assemble_step()
+            self.step_n += 1
+            return
+        if self.step_n == self.assemble_rounds:
+            self.create_pools()
+        if self.step_n >= self.assemble_rounds:
+            if self.step_n - self.assemble_rounds < self.seasons:
+                self.schedule.step()
+                self.datacollector.collect(self)
+                self.step_n += 1
+        if self.step_n == (self.assemble_rounds + self.seasons) - 1 and self.verbose:
+            self.print_results()

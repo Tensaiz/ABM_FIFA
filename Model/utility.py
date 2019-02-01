@@ -1,5 +1,6 @@
 import math
 import random
+import time
 
 def match_outcome(manager_1, manager_2):
     """
@@ -28,7 +29,7 @@ def match_outcome(manager_1, manager_2):
     draw = get_draw(victory_p)
 
     chance = random.uniform(0, 1)
-
+    result = None
     if draw == chance:
         result = 2
     elif chance < victory_p:
@@ -79,3 +80,23 @@ def get_manager_market_value(manager):
 
 def get_draw(p_victory):
     return (1/3) * math.exp(-( (p_victory-0.5)**2 / (2 * 0.28**2)))
+
+
+def transform_fifa(player_stats):
+    start_time = time.time()
+    player_stats['Release Clause'] = player_stats['Release Clause'].apply(transform_to_number)
+    player_stats['Value'] = player_stats['Value'].apply(transform_to_number)
+    print("Transforming fifa data took --- %s seconds ---" % (time.time() - start_time))
+    return player_stats
+
+
+def transform_to_number(release_clause):
+    if isinstance(release_clause, float):
+        return 0
+    elif release_clause == '€0':
+        return 0
+    elif release_clause[-1] == 'K':
+        multiplier = 1000
+    elif release_clause[-1] == 'M':
+        multiplier = 1000000
+    return float(release_clause[1:-1]) * multiplier

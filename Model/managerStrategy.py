@@ -13,7 +13,7 @@ class ManagerStrategy(object):
         raise NotImplementedError()
 
     def executeRecoveryStrategy(self, currentManager):
-        #raise NotImplementedError()
+        raise NotImplementedError()
         print('Executing recovery strategy...')
 
     SPECIFIC_POSITION_DICT = {
@@ -111,12 +111,16 @@ class ManagerStrategy(object):
     def buy_free_player(self, manager, pos, money):
         attempt = 0
         possible_players = self.pick_player(pos, money)
+        if attempt >= len(possible_players):
+            return
         chosen_player = possible_players.iloc[attempt]
         # Might have to catch a key error if the player isn't in the dictionary here
         player_agent = self.model.player_lookup[chosen_player['Name']]
         if player_agent.manager != None:
             player_agent = None
         while (player_agent == None):
+            if attempt >= len(possible_players):
+                return
             chosen_player = possible_players.iloc[attempt]
             # Might have to catch a key error if the player isn't in the dictionary here
             player_agent = self.model.player_lookup[chosen_player['Name']]
@@ -189,6 +193,10 @@ class EvenStrategy(ManagerStrategy):
 
     def executeTradeStrategy(self, currentManager):
         pass
+
+    def executeRecoveryStrategy(self, currentManager):
+        pass
+
 
 class UnforgivingStrategy(ManagerStrategy):
 
@@ -299,7 +307,8 @@ class UnforgivingStrategy(ManagerStrategy):
             for player in currentManager.accepted:
                 position = player.position
                 replaceable_player = currentManager.team[position]
-                self.kick_player(currentManager, replaceable_player, position)
+                if replaceable_player:
+                    self.kick_player(currentManager, replaceable_player, position)
                 currentManager.team[position] = player
 
         currentManager.accepted = []
@@ -360,9 +369,10 @@ class SimpleStrategy(ManagerStrategy):
         worst_player = None
         overall = 100
         for pos, player in currentManager.team.items():
-            if player.stats['Overall'] < overall: # during one run got AttributeError: 'NoneType' object has no attribute 'stats'
-                worst_player = player
-                overall = worst_player.stats['Overall']
+            if player:
+                if player.stats['Overall'] < overall: # during one run got AttributeError: 'NoneType' object has no attribute 'stats'
+                    worst_player = player
+                    overall = worst_player.stats['Overall']
         position = worst_player.position
 
         # Buy or send offer to best player you can buy

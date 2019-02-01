@@ -74,6 +74,10 @@ class RandomActivationFIFA(RandomActivation):
                         continue
                     self.play_match(manager, manager_2)
 
+        for manager in model.managers:
+            print(manager.game_history)
+
+
     def play_match(self, manager_1, manager_2):
         outcome = match_outcome(manager_1, manager_2)
         if outcome == 0:
@@ -111,17 +115,16 @@ class RandomActivationFIFA(RandomActivation):
         self.time += 1
 
     def get_manager_assets(self):
-        manager_assets = []
+        manager_assets = {}
 
         for m in self.managers:
-            manager_assets.append(m.assets)
+            manager_assets[m.name] = m.assets
 
         return manager_assets
 
     def get_manager_reputation(self):
-        manager_rep = []
+        manager_rep = {}
 
         for m in self.managers:
-            manager_rep.append(m.reputation)
-
+            manager_rep[m.name] = m.reputation
         return manager_rep

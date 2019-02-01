@@ -117,3 +117,4 @@ dmypy.json
 # editors
 .vscode/
 .vs/
+/Model/.vscode/
