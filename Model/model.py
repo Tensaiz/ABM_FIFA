@@ -167,7 +167,7 @@ class FIFA_Simulation(Model):
     def print_results(self):
         print('Win / loss overview per manager after ' + str(self.seasons) +' seasons:')
         for manager in self.managers:
-            print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + '\nHas ' + str(manager.game_history.count(1)) + ' wins and ' + str(manager.game_history.count(0)) + ' losses. Has ' + str(manager.reputation) + ' reputation.') 
+            print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + '\nHas ' + str(manager.game_history.count(0)) + ' wins and ' + str(manager.game_history.count(1)) + ' losses. Has ' + str(manager.reputation) + ' reputation.') 
             print('Has ' + str(manager.assets) + ' funds remaining and used ' + type(manager.strategy).__name__ + '\n')
 
         results = sorted(self.managers, key=lambda manager: manager.game_history.count(1), reverse=True)
