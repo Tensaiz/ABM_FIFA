@@ -29,7 +29,7 @@ def match_outcome(manager_1, manager_2):
     draw = get_draw(victory_p)
 
     chance = random.uniform(0, 1)
-
+    result = None
     if draw == chance:
         result = 2
     elif chance < victory_p:

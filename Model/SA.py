@@ -16,7 +16,7 @@ def run_FIFA_model():
     problem = {
         'num_vars': 3,
         'names': ['mu', 'sigma', 'earnings_ratio'],
-        'bounds': [[10 * 10 ^ 6, 50 * 10 ^ 6], [10 ^ 5, 10 ^ 7], [(1 / 20), (1 / 5)]]
+        'bounds': [[25000000, 50000000], [2500000, 5000000], [(1 / 20), (1 / 5)]]
     }
 
     # Set the repetitions, the amount of steps, and the amount of distinct values per variable
