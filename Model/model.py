@@ -11,6 +11,7 @@ from fifa_schedule import RandomActivationFIFA
 from player import Player
 from manager import Manager
 import managerStrategy
+import utility
 
 class FIFA_Simulation(Model):
     """
@@ -36,10 +37,13 @@ class FIFA_Simulation(Model):
         strategies (:list:`int`): A list with the different strategies
     """
 
+    player_stats = None
+
     def __init__(self, assemble_rounds = 1, seasons = 15, n_pools = 1, n_players = 0, 
-                 player_stats = pd.read_csv('../data.csv'), money_distribution_type = 0,
+                 player_stats_ = pd.read_csv('../data.csv'), money_distribution_type = 0,
                  mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=True,
                  strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy()]):
+
 
         self.verbose = verbose
         # Set parameters
@@ -51,7 +55,12 @@ class FIFA_Simulation(Model):
         self.n_pools = n_pools
         self.n_managers = 18 * n_pools
         self.n_players = n_players
-        self.player_stats = self.transform_fifa(player_stats)
+
+        if FIFA_Simulation.player_stats is None:
+            FIFA_Simulation.player_stats = utility.transform_fifa(player_stats_)
+
+
+
         self.money_distribution_type = money_distribution_type
         self.strategies = strategies
 
@@ -70,23 +79,9 @@ class FIFA_Simulation(Model):
         # Initialization functions
         self.init_agents()
 
-    def transform_fifa(self, player_stats):
-        start_time = time.time()
-        player_stats['Release Clause'] = player_stats['Release Clause'].apply(self.transform_to_number)
-        player_stats['Value'] = player_stats['Value'].apply(self.transform_to_number)
-        print("Transforming fifa data took --- %s seconds ---" % (time.time() - start_time))
-        return player_stats
 
-    def transform_to_number(self, release_clause):
-        if isinstance(release_clause, float):
-            return 0
-        elif release_clause == '€0':
-            return 0
-        elif release_clause[-1] == 'K':
-            multiplier = 1000
-        elif release_clause[-1] == 'M':
-            multiplier = 1000000
-        return float(release_clause[1:-1]) * multiplier
+
+
 
     def init_agents(self):
         start_time = time.time()
@@ -96,10 +91,10 @@ class FIFA_Simulation(Model):
 
     def init_players(self):
         if self.n_players == 0:
-            self.n_players = len(self.player_stats)
+            self.n_players = len(FIFA_Simulation.player_stats)
 
         # Randomly select n_players amount of players
-        self.chosen_player_stats = self.player_stats.sample(self.n_players)
+        self.chosen_player_stats = FIFA_Simulation.player_stats.sample(self.n_players)
 
         for i in range(self.n_players):
             p = Player(self.chosen_player_stats.iloc[i]['Name'], self, self.chosen_player_stats.iloc[i])

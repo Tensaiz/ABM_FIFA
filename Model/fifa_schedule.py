@@ -111,17 +111,16 @@ class RandomActivationFIFA(RandomActivation):
         self.time += 1
 
     def get_manager_assets(self):
-        manager_assets = []
+        manager_assets = {}
 
         for m in self.managers:
-            manager_assets.append(m.assets)
+            manager_assets[m.name] = m.assets
 
         return manager_assets
 
     def get_manager_reputation(self):
-        manager_rep = []
+        manager_rep = {}
 
         for m in self.managers:
-            manager_rep.append(m.reputation)
-
+            manager_rep[m.name] = m.reputation
         return manager_rep
