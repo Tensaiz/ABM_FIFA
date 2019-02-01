@@ -41,7 +41,7 @@ class FIFA_Simulation(Model):
 
     def __init__(self, assemble_rounds = 1, seasons = 15, n_pools = 1, n_players = 0, 
                  player_stats_ = pd.read_csv('../data.csv'), money_distribution_type = 0,
-                 mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=True,
+                 mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=True, player_stats = None,
                  strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy()]):
 
 
@@ -58,8 +58,6 @@ class FIFA_Simulation(Model):
 
         if FIFA_Simulation.player_stats is None:
             FIFA_Simulation.player_stats = utility.transform_fifa(player_stats_)
-
-
 
         self.money_distribution_type = money_distribution_type
         self.strategies = strategies
@@ -169,7 +167,7 @@ class FIFA_Simulation(Model):
     def print_results(self):
         print('Win / loss overview per manager after ' + str(self.seasons) +' seasons:')
         for manager in self.managers:
-            print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + '\nHas ' + str(manager.game_history.count(1)) + ' wins and ' + str(manager.game_history.count(0)) + ' losses.')
+            print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + '\nHas ' + str(manager.game_history.count(1)) + ' wins and ' + str(manager.game_history.count(0)) + ' losses. Has ' + str(manager.reputation) + ' reputation.') 
             print('Has ' + str(manager.assets) + ' funds remaining and used ' + type(manager.strategy).__name__ + '\n')
 
         results = sorted(self.managers, key=lambda manager: manager.game_history.count(1), reverse=True)
