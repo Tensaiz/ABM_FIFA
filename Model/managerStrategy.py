@@ -117,6 +117,8 @@ class ManagerStrategy(object):
         if player_agent.manager != None:
             player_agent = None
         while (player_agent == None):
+            if attempt => len(possible_players):
+                return
             chosen_player = possible_players.iloc[attempt]
             # Might have to catch a key error if the player isn't in the dictionary here
             player_agent = self.model.player_lookup[chosen_player['Name']]
