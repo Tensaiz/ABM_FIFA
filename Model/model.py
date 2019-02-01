@@ -170,7 +170,7 @@ class FIFA_Simulation(Model):
             print('Manager ' + str(manager.name) + ' started with: €' + str(manager.starting_assets) + '\nHas ' + str(manager.game_history.count(0)) + ' wins and ' + str(manager.game_history.count(1)) + ' losses. Has ' + str(manager.reputation) + ' reputation.') 
             print('Has ' + str(manager.assets) + ' funds remaining and used ' + type(manager.strategy).__name__ + '\n')
 
-        results = sorted(self.managers, key=lambda manager: manager.game_history.count(1), reverse=True)
+        results = sorted(self.managers, key=lambda manager: manager.game_history.count(0), reverse=True)
         for i, manager in enumerate(results):
             print('Manager ' + str(manager.name) + ' finished ' + str(i + 1) + 'th place and used strategy: ' + type(manager.strategy).__name__ + '\n')
 

@@ -46,7 +46,6 @@ class RandomActivationFIFA(RandomActivation):
 
         for manager in self.managers:
             manager.step()
-            manager.assets += manager.earnings
 
         for player in self.players:
             player.step()
