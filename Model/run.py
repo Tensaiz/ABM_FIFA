@@ -6,7 +6,7 @@ import utility
 def run_FIFA_model():
 
     player_stats = utility.transform_fifa(pd.read_csv('../data.csv'))
-    model = FIFA_Simulation(player_stats=player_stats)
+    model = FIFA_Simulation(player_stats_=player_stats)
 
     model.run()
 
