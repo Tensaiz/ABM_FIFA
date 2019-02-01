@@ -111,13 +111,15 @@ class ManagerStrategy(object):
     def buy_free_player(self, manager, pos, money):
         attempt = 0
         possible_players = self.pick_player(pos, money)
+        if attempt >= len(possible_players):
+            return
         chosen_player = possible_players.iloc[attempt]
         # Might have to catch a key error if the player isn't in the dictionary here
         player_agent = self.model.player_lookup[chosen_player['Name']]
         if player_agent.manager != None:
             player_agent = None
         while (player_agent == None):
-            if attempt => len(possible_players):
+            if attempt >= len(possible_players):
                 return
             chosen_player = possible_players.iloc[attempt]
             # Might have to catch a key error if the player isn't in the dictionary here

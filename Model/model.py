@@ -41,7 +41,7 @@ class FIFA_Simulation(Model):
 
     def __init__(self, assemble_rounds = 1, seasons = 15, n_pools = 1, n_players = 0, 
                  player_stats_ = pd.read_csv('../data.csv'), money_distribution_type = 0,
-                 mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=True, player_stats = None,
+                 mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=False, player_stats = None,
                  strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy()]):
 
 
@@ -87,7 +87,8 @@ class FIFA_Simulation(Model):
         start_time = time.time()
         self.init_players()
         self.init_managers()
-        print("Initializing agents took --- %s seconds ---" % (time.time() - start_time))
+        if self.verbose:
+            print("Initializing agents took --- %s seconds ---" % (time.time() - start_time))
 
     def init_players(self):
         if self.n_players == 0:
@@ -185,7 +186,8 @@ class FIFA_Simulation(Model):
 
         for _ in range(self.assemble_rounds):
             self.schedule.assemble_step()
-        print("Assembling teams took --- %s seconds ---" % (time.time() - start_time))
+        if self.verbose:
+            print("Assembling teams took --- %s seconds ---" % (time.time() - start_time))
 
         self.create_pools()
 
@@ -193,7 +195,8 @@ class FIFA_Simulation(Model):
         for _ in range(self.seasons):
             self.schedule.step()
             self.datacollector.collect(self)
-        print("Simulating seasons took --- %s seconds ---" % (time.time() - start_time))
+        if self.verbose:
+            print("Simulating seasons took --- %s seconds ---" % (time.time() - start_time))
         self.running = False
         self.print_results()
 
@@ -210,5 +213,5 @@ class FIFA_Simulation(Model):
                 self.schedule.step()
                 self.datacollector.collect(self)
                 self.step_n += 1
-        if self.step_n == (self.assemble_rounds + self.seasons) - 1:
+        if self.step_n == (self.assemble_rounds + self.seasons) - 1 and self.verbose:
             self.print_results()
