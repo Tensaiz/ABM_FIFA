@@ -72,11 +72,13 @@ class FIFA_Simulation(Model):
         self.datacollector = DataCollector(
             {"Manager assets": lambda m: m.schedule.get_manager_assets(),
              "Manager reputation": lambda m: m.schedule.get_manager_reputation()})
-        self.running = False
+        self.running = True
 
         # Initialization functions
         self.init_agents()
-
+        self.step_n = 0
+        # Collect first time
+        self.datacollector.collect(self)
 
 
 
@@ -109,7 +111,7 @@ class FIFA_Simulation(Model):
             strategy.model = self # Some strategies need access to model
             # Then they are able to make better decisions
 
-            m = Manager(i, self, assets[i], self.earnings_ratio, 0, strategy, 0)
+            m = Manager(i, self, max(5000000, assets[i]), self.earnings_ratio, 0, strategy, 0)
             self.managers.append(m)
             self.schedule.add_agent(m)
 
@@ -174,12 +176,13 @@ class FIFA_Simulation(Model):
         for i, manager in enumerate(results):
             print('Manager ' + str(manager.name) + ' finished ' + str(i + 1) + 'th place and used strategy: ' + type(manager.strategy).__name__ + '\n')
 
-    def run(self):
+    def run_model(self):
         """
         Runs the model after initialization by first assembling the teams and then playing the matches
         """
         self.running = True
         start_time = time.time()
+
         for _ in range(self.assemble_rounds):
             self.schedule.assemble_step()
         print("Assembling teams took --- %s seconds ---" % (time.time() - start_time))
@@ -193,3 +196,19 @@ class FIFA_Simulation(Model):
         print("Simulating seasons took --- %s seconds ---" % (time.time() - start_time))
         self.running = False
         self.print_results()
+
+    # Mesa required step function
+    def step(self):
+        if self.step_n < self.assemble_rounds:
+            self.schedule.assemble_step()
+            self.step_n += 1
+            return
+        if self.step_n == self.assemble_rounds:
+            self.create_pools()
+        if self.step_n >= self.assemble_rounds:
+            if self.step_n - self.assemble_rounds < self.seasons:
+                self.schedule.step()
+                self.datacollector.collect(self)
+                self.step_n += 1
+        if self.step_n == (self.assemble_rounds + self.seasons) - 1:
+            self.print_results()
