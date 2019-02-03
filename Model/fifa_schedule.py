@@ -74,8 +74,8 @@ class RandomActivationFIFA(RandomActivation):
                         continue
                     self.play_match(manager, manager_2)
 
-        for manager in model.managers:
-            print(manager.game_history)
+        #for manager in self.model.managers:
+        #    print(manager.game_history)
 
 
     def play_match(self, manager_1, manager_2):

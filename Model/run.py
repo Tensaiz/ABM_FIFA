@@ -1,8 +1,11 @@
 import pandas as pd
 import managerStrategy
 from model import FIFA_Simulation
-<<<<<<< HEAD
+import utility
+import matplotlib.pyplot as plt
 
+
+"""
 def run_FIFA_model():
 
     assemble_rounds = 1
@@ -21,9 +24,8 @@ def run_FIFA_model():
     model = FIFA_Simulation(assemble_rounds, seasons, n_pools, n_players, player_stats, money_distribution_type, money_distribution_params, earnings_ratio, strategies, verbose)
     model = FIFA_Simulation()
     model.run()
-=======
-import utility
-import matplotlib.pyplot as plt
+    """
+
 
 def run_FIFA_model():
 
@@ -32,7 +34,7 @@ def run_FIFA_model():
     evenstrat = []
     unforgiving = []
     simple = []
->>>>>>> 6bef7d0711bb8940e9683a8c05f5033a9bfefab0
+
 
     evenstrat_money = []
     unforgiving_money = []
@@ -71,14 +73,14 @@ def run_FIFA_model():
 
     plot(evenstrat, unforgiving, simple, evenstrat_money, unforgiving_money, simple_money)
     data = model.datacollector.get_model_vars_dataframe()
-<<<<<<< HEAD
+
     print(data)
-=======
-    # print(data)
 
 def plot(tactic1, tactic2, tactic3, money1, money2, money3):
     x = list(range(1, 11))
+
     plt.figure(0)
+    plt.title("Tactic")
     plt.scatter(x, tactic1, label='Even strategy')
     plt.scatter(x, tactic2, label='Unforgiving strategy')
     plt.scatter(x, tactic3, label='Simple strategy')
@@ -88,6 +90,7 @@ def plot(tactic1, tactic2, tactic3, money1, money2, money3):
     plt.legend()
     plt.show()
 
+    plt.title("Money")
     plt.figure(1)
     plt.scatter(x, money1, label='Even strategy')
     plt.scatter(x, money2, label='Unforgiving strategy')
@@ -97,7 +100,7 @@ def plot(tactic1, tactic2, tactic3, money1, money2, money3):
     plt.xticks(x)
     plt.legend()
     plt.show()
->>>>>>> 6bef7d0711bb8940e9683a8c05f5033a9bfefab0
+
 
 if __name__ == "__main__":
     run_FIFA_model()
