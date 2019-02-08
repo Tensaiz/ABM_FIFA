@@ -197,8 +197,8 @@ class FIFA_Simulation(Model):
             self.datacollector.collect(self)
         if self.verbose:
             print("Simulating seasons took --- %s seconds ---" % (time.time() - start_time))
+            self.print_results()
         self.running = False
-        self.print_results()
 
     # Mesa required step function
     def step(self):

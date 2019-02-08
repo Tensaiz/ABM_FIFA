@@ -41,6 +41,7 @@ def run_FIFA_model():
     simple_money = []
 
     for i in range(10):
+        print('Run ' + str(i + 1))
         model = FIFA_Simulation(player_stats=player_stats, verbose=False)
         model.run_model()
 
@@ -84,7 +85,7 @@ def plot(tactic1, tactic2, tactic3, money1, money2, money3):
     plt.scatter(x, tactic1, label='Even strategy')
     plt.scatter(x, tactic2, label='Unforgiving strategy')
     plt.scatter(x, tactic3, label='Simple strategy')
-    plt.ylabel('Cummulative manager reputation after 15 seasons')
+    plt.ylabel('Cummulative manager reputation after 25 seasons')
     plt.xlabel('Iteration')
     plt.xticks(x)
     plt.legend()
@@ -95,7 +96,7 @@ def plot(tactic1, tactic2, tactic3, money1, money2, money3):
     plt.scatter(x, money1, label='Even strategy')
     plt.scatter(x, money2, label='Unforgiving strategy')
     plt.scatter(x, money3, label='Simple strategy')
-    plt.ylabel('Cummulative manager assets after 15 seasons')
+    plt.ylabel('Cummulative manager assets after 25 seasons')
     plt.xlabel('Iteration')
     plt.xticks(x)
     plt.legend()

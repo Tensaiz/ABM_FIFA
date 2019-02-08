@@ -195,7 +195,18 @@ class EvenStrategy(ManagerStrategy):
         pass
 
     def executeRecoveryStrategy(self, currentManager):
-        pass
+        '''
+        Buy new players for positions that are currently vacant
+        '''
+        empty_postions = []
+        for pos, player in currentManager.team.items():
+            if player == None:
+                empty_postions.append(pos)
+
+        for pos in empty_postions:
+            # buy a new player to fill the position that will accept your offer
+            money = currentManager.assets / len(empty_postions)
+            self.buy_free_player(currentManager, pos, money)
 
 
 class UnforgivingStrategy(ManagerStrategy):
@@ -269,17 +280,11 @@ class UnforgivingStrategy(ManagerStrategy):
             Offer(currentManager, final_candidate, final_candidate.position) 
             
     def executeRecoveryStrategy(self, currentManager):
-        # mostly copied from SimpleStrategy, but different budget for free players 
-        a = 1.25       # or something else
-        budget_for_replacing_player = a*(currentManager.assets/currentManager.TEAM_SIZE)
-
         # Get empty positions
         empty_postions = []
         for pos, player in currentManager.team.items():
             if player == None:
                 empty_postions.append(pos)
-        n_players_who_quit = len(empty_postions)
-
         for pos in empty_postions:
             # Check if you can fill an empty position with a player that accepted your offer
             filled = False
@@ -295,47 +300,20 @@ class UnforgivingStrategy(ManagerStrategy):
                     currentManager.accepted.remove(player)
                     break
             if filled:
-                empty_postions.remove(pos)
                 continue
 
             # Otherwise buy a new player to fill the position that will accept your offer
-            self.buy_free_player(currentManager, pos, (currentManager.assets / len(empty_postions)))
-
-
-            # Allow any remaining players that accepted the offer to join
-        if len(currentManager.accepted) != 0:
-            for player in currentManager.accepted:
-                position = player.position
-                replaceable_player = currentManager.team[position]
-                if replaceable_player:
-                    self.kick_player(currentManager, replaceable_player, position)
-                currentManager.team[position] = player
+            money = currentManager.assets / len(empty_postions)
+            self.buy_free_player(currentManager, pos, money)
+        # Now choose between left over players that accepted your offer
+        for player in currentManager.accepted:
+            position = player.position
+            replaceable_player = currentManager.team[position]
+            if replaceable_player:
+                self.kick_player(currentManager, replaceable_player, position)
+            currentManager.team[position] = player
 
         currentManager.accepted = []
- 
-        ''' If 1) nobody resigned AND 2a) couldn't find any affordable players from better teams to send offer to OR 
-        # 2b) none of the players from better teams accepted the offer, then replace the worst player in the current team 
-        by buying a new player (to still improve the team somwhat) '''
-        if n_players_who_quit == 0 and len(currentManager.accepted) == 0:
-            
-            # Get worst player
-            worst_player = None
-            overall = 100
-            for pos, player in currentManager.team.items():
-                if player.stats['Overall'] < overall:
-                    worst_player = player
-                    overall = worst_player.stats['Overall']
-            position = worst_player.position
-
-            # Buy or send offer to best player you can buy
-            possible_players = self.pick_player(position, budget_for_replacing_player)
-            if len(possible_players > 0):
-                chosen_player = possible_players.iloc[0]
-                if (chosen_player['Overall'] > worst_player.stats['Overall']):
-                    # Might have to catch a key error if the player isn't in the dictionary here
-                    player_agent = self.model.player_lookup[chosen_player['Name']]
-                    # Send offer to the player
-                    Offer(currentManager, player_agent, position)
 
 class SimpleStrategy(ManagerStrategy):
     '''
@@ -370,7 +348,7 @@ class SimpleStrategy(ManagerStrategy):
         overall = 100
         for pos, player in currentManager.team.items():
             if player:
-                if player.stats['Overall'] < overall: # during one run got AttributeError: 'NoneType' object has no attribute 'stats'
+                if player.stats['Overall'] < overall:
                     worst_player = player
                     overall = worst_player.stats['Overall']
         position = worst_player.position
@@ -407,7 +385,6 @@ class SimpleStrategy(ManagerStrategy):
                     currentManager.accepted.remove(player)
                     break
             if filled:
-                empty_postions.remove(pos)
                 continue
 
             # Otherwise buy a new player to fill the position that will accept your offer

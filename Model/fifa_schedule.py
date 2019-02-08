@@ -51,14 +51,15 @@ class RandomActivationFIFA(RandomActivation):
         for player in self.players:
             player.step()
 
-        self.get_incomplete_teams()
+        
         self.shuffle_agents()
 
         for manager in set(self.managers):
             manager.recovery_step()
-            manager.assets += manager.earnings
 
-        self.incomplete_teams = []
+        #  Debug incomplete teams
+        # self.get_incomplete_teams()
+        # self.incomplete_teams = []
 
         self.increment_time()
 
@@ -105,6 +106,8 @@ class RandomActivationFIFA(RandomActivation):
                     incomplete = True
             if incomplete:
                 self.incomplete_teams.append(manager)
+        for manager in self.incomplete_teams:
+            print('Manager ' + str(manager.name) + ' has incomplete team and is using ' + type(manager.strategy).__name__ + '\n')
 
     def shuffle_agents(self):
         random.shuffle(self.managers)

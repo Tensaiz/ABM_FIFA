@@ -161,7 +161,6 @@ class Manager(Agent):
 
     def step(self):
         self.strategy.executeTradeStrategy(self)
-        self.earnings = self.assets * self.earnings_ratio
 
     def recovery_step(self):
         self.strategy.executeRecoveryStrategy(self)

@@ -13,8 +13,8 @@ def match_outcome(manager_1, manager_2):
         - Average age
 
     Args:
-        team_1 (:obj: manager): 
-        team_2 (:obj: manager): 
+        team_1 (:obj: manager):
+        team_2 (:obj: manager):
     Returns:
         outcome (int): The outcome of the match, whether team_1 has won from team_2
             0 = team_1 won
@@ -50,14 +50,14 @@ def get_average_age_team(manager):
     '''
     Calculate the average age of the team
     '''
-    sum_ages = 0 
-    current_team_size = 0     
-    for pos, player in manager.team.items():  
+    sum_ages = 0
+    current_team_size = 0
+    for pos, player in manager.team.items():
         if player != None:
             current_team_size += 1
-            sum_ages += player.stats['Age']        
-    return sum_ages / current_team_size       
-     
+            sum_ages += player.stats['Age']
+    return sum_ages / current_team_size
+
 def market_value_win_probability(manager_1, manager_2):
     '''
     Use sigmoid function to calculate probability of team 1 winning over team 2 based on average market value of the teams
