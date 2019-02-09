@@ -75,12 +75,9 @@ class RandomActivationFIFA(RandomActivation):
                         continue
                     self.play_match(manager, manager_2)
 
-        #for manager in self.model.managers:
-        #    print(manager.game_history)
-
 
     def play_match(self, manager_1, manager_2):
-        outcome = match_outcome(manager_1, manager_2)
+        outcome = match_outcome(self.model, manager_1, manager_2)
         if outcome == 0:
             # Manager one won
             manager_1.game_history.append(0)

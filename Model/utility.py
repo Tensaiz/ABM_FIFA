@@ -2,7 +2,7 @@ import math
 import random
 import time
 
-def match_outcome(manager_1, manager_2):
+def match_outcome(model, manager_1, manager_2):
     """
     Determines the outcome of a match between the teams of two managers
 
@@ -21,16 +21,23 @@ def match_outcome(manager_1, manager_2):
             1 = team_2 won
             2 = tie
     """
+    match_weights = model.match_weights
+
     age_p = average_age_win_probability(manager_1, manager_2)
-    age_weight = 0.25
+    age_weight = match_weights[1]
+
     market_p = market_value_win_probability(manager_1, manager_2)
-    market_weight = 1
-    victory_p = market_p * market_weight
+    market_weight = match_weights[0]
+
+    spi_p = spi_win_probability(manager_1, manager_2)
+    spi_weight = match_weights[2]
+
+    victory_p = ((market_p * market_weight) + (age_p * age_weight) + (spi_p * spi_weight)) / (market_weight + age_weight + spi_weight)
     draw = get_draw(victory_p)
 
     chance = random.uniform(0, 1)
     result = None
-    if draw == chance:
+    if chance < draw:
         result = 2
     elif chance < victory_p:
         result = 0
@@ -52,7 +59,7 @@ def get_average_age_team(manager):
     '''
     sum_ages = 0
     current_team_size = 0
-    for pos, player in manager.team.items():
+    for _, player in manager.team.items():
         if player != None:
             current_team_size += 1
             sum_ages += player.stats['Age']
@@ -78,9 +85,44 @@ def get_manager_market_value(manager):
             market_value += player.stats['Value']
     return market_value / len(positions)
 
+
+def spi_win_probability(manager_1, manager_2):
+    spi_1 = get_team_spi(manager_1)
+    spi_2 = get_team_spi(manager_2)
+    diff = spi_1 - spi_2
+    
+    left_bound = -30
+    right_bound = 30
+    bound = right_bound - left_bound # 70
+    min_prob = 0
+    max_prob = 100
+    prob = max_prob - min_prob # 100
+
+    scaled = float(diff - left_bound) / float(bound)
+    win_value = min_prob + (scaled * prob)
+    win_value = max(0, win_value)
+
+    return min(win_value, 100) / 100
+
+def get_team_spi(manager):
+    attacking = 0
+    midfield = 0
+    defense = 0
+    sub = 0
+    for pos, player in manager.team.items():
+        position = pos.split('_')[0]
+        if position == 'defender' or position == 'keeper':
+            defense += player.stats['Overall']
+        elif position == 'attacker':
+            attacking += player.stats['Overall']
+        elif position == 'midfielder':
+            midfield += player.stats['Overall']
+        elif position == 'sub':
+            sub += player.stats['Overall']
+    return (attacking + midfield + defense + sub) / 4
+
 def get_draw(p_victory):
     return (1/3) * math.exp(-( (p_victory-0.5)**2 / (2 * 0.28**2)))
-
 
 def transform_fifa(player_stats):
     start_time = time.time()

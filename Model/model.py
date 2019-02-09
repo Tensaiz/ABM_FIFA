@@ -42,6 +42,8 @@ class FIFA_Simulation(Model):
     def __init__(self, assemble_rounds = 1, seasons = 15, n_pools = 1, n_players = 0, 
                  player_stats_ = pd.read_csv('../data.csv'), money_distribution_type = 0,
                  mu = 25000000, sigma = 2500000, earnings_ratio = (1/2), verbose=False, player_stats = None,
+                 # market value, age, spi
+                 match_weights = [0.25, 0.1, 1],
                  strategies = [managerStrategy.SimpleStrategy(), managerStrategy.EvenStrategy(), managerStrategy.UnforgivingStrategy()]):
 
 
@@ -55,6 +57,8 @@ class FIFA_Simulation(Model):
         self.n_pools = n_pools
         self.n_managers = 18 * n_pools
         self.n_players = n_players
+
+        self.match_weights = match_weights
 
         if FIFA_Simulation.player_stats is None:
             FIFA_Simulation.player_stats = utility.transform_fifa(player_stats_)
