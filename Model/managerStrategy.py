@@ -163,18 +163,25 @@ class ExampleStrategy(ManagerStrategy):
         return strategy
 
     def executeTradeStrategy(self, currentManager):
-        # use the same strategy as in Assembly
-        return self.getAssemblyStrategy(currentManager)
+        pass
 
     def executeRecoveryStrategy(self, currentManager):
-        # use the same strategy as in Assembly
-        return self.getAssemblyStrategy(currentManager)
+        '''
+        Buy new players for positions that are currently vacant
+        '''
+        empty_postions = []
+        for pos, player in currentManager.team.items():
+            if player == None:
+                empty_postions.append(pos)
 
+        for pos in empty_postions:
+            # buy a new player to fill the position that will accept your offer
+            money = currentManager.assets / len(empty_postions)
+            self.buy_free_player(currentManager, pos, money)
 
 class EvenStrategy(ManagerStrategy):
 
     def getAssemblyStrategy(self, currentManager):
-        # pass just current manager :D
         if currentManager.team_type == 0:
             # Spend an even amount of money on each player
             money = currentManager.assets / currentManager.TEAM_SIZE
@@ -213,16 +220,10 @@ class UnforgivingStrategy(ManagerStrategy):
 
     '''
     Spread money evenly for team assembly,
-    Trade step: After a decent season, don't trade. After a mediocre or bad season,  replace the current team with n players from teams that did better last season, when 
-    this doesn't fully work, buy free players with this budget: 1.25 (or other nr if we want) * assets/team.SIZE)
-    Recovery step: if necessary bBuy the best player you can for empty positions and if not a single person has been 
-    replaced, still buy a free player
-
+    Trade step: After a decent season, don't trade. After a mediocre or bad season,  replace the current team with n players from teams that did better last season.
+    Recovery step: if necessary buy the best player you can for empty positions
     '''
     def getAssemblyStrategy(self, currentManager):
-        # (For now) copied from EvenStrategy 
-
-        # pass just current manager :D
         if currentManager.team_type == 0:
             # Spend an even amount of money on each player
             money = currentManager.assets / currentManager.TEAM_SIZE
@@ -241,7 +242,7 @@ class UnforgivingStrategy(ManagerStrategy):
 
     def executeTradeStrategy(self, currentManager):
         teams_ranking_last_season = sorted(self.model.managers, key=lambda manager: manager.game_history[-34:].count(1), reverse=True)
-        own_ranking_place = teams_ranking_last_season.index(currentManager) # this and above line maybe funct/attr in model
+        own_ranking_place = teams_ranking_last_season.index(currentManager) 
         n_traitors_recruiting = 0
         lower_boundary_wins = 0.4
         middle_boundary_wins = 0.7
@@ -250,9 +251,8 @@ class UnforgivingStrategy(ManagerStrategy):
 	        n_traitors_recruiting = 5
         if lower_boundary_wins <=  proportion_won_last_season  <= middle_boundary_wins:
 	        n_traitors_recruiting = 3
-        a = 1.25       # or something else
-        budget_for_replacing_player = a*(currentManager.assets/currentManager.TEAM_SIZE)
-
+        budget_for_replacing_player = currentManager.assets/n_traitors_recruiting if n_traitors_recruiting != 0 else 0
+       
         candidates_recruitment = []  
         for better_team in teams_ranking_last_season[:own_ranking_place-1]:
             for pos, player in better_team.team.items():  
@@ -266,16 +266,14 @@ class UnforgivingStrategy(ManagerStrategy):
                 candidate = random.choice(candidates_recruitment)
                 narrowed_down_candidate_list.append(candidate)
                 candidates_recruitment.remove(candidate) 
-                ''' later: add a function to check that no more than 3 or 4 of a type of player is recruited,
-                because if there's more and they all accept you'd have wasted money on this 'extra' player you have to reject'''
+               
         elif len(candidates_recruitment) < n_traitors_recruiting:
             if len(candidates_recruitment) != 0:
                 for i in range(len(candidates_recruitment)):
                     candidate = random.choice(candidates_recruitment)
                     narrowed_down_candidate_list.append(candidate)
                     candidates_recruitment.remove(candidate) 
-                    '''idem'''
-                     
+                   
         for final_candidate in narrowed_down_candidate_list:
             Offer(currentManager, final_candidate, final_candidate.position) 
             
@@ -322,7 +320,6 @@ class SimpleStrategy(ManagerStrategy):
     Recovery step: Buy the best player you can for the missing positions
     '''
     def getAssemblyStrategy(self, currentManager):
-        # pass just current manager :D
         if currentManager.team_type == 0:
             # Spend an even amount of money on each player
             money = currentManager.assets / currentManager.TEAM_SIZE
@@ -399,16 +396,3 @@ class SimpleStrategy(ManagerStrategy):
             currentManager.team[position] = player
 
         currentManager.accepted = []
-
-
-
-class BestPlayerStrategy(ManagerStrategy):
-
-    def getAssemblyStrategy(self, currentManager):
-        pass
-
-    def executeTradeStrategy(self, currentManager):
-        pass
-
-    def executeRecoveryStrategy(self, currentManager):
-        pass
