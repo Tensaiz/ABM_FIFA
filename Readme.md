@@ -21,32 +21,6 @@ This project contains multiple files belonging to the model and top-level runnin
     - fifa_schedule.py: the file that schedules the managers and players accordingly
     - utility.py: a utility file that calculates the probability of winning for one team versus another
 
-
-### TODO:
-
-#### Model
-
-- Implement match system where pools are created that have 18 managers and each (manager) team plays each other 2 times
-
-#### Player
-
-- Needs a step function to determine what the player does every action,
-- Afterwards it should choose between new teams if he is invited by a manager
-
-#### Manager
-
-- Create purchase mechanism between manager agents
-- Create player buying mechanics
-- Create different optimisation strategies to assemble a team
-
-#### Scheduler
-
-- Incorporate aging
-
-#### Utility
-
-- Create match system between managers
-
 ### Literature and sources
 
 #### Dataset
