@@ -75,7 +75,8 @@ class FIFA_Simulation(Model):
         self.schedule = RandomActivationFIFA(self)
         self.datacollector = DataCollector(
             {"Manager assets": lambda m: m.schedule.get_manager_assets(),
-             "Manager reputation": lambda m: m.schedule.get_manager_reputation()})
+             "Manager reputation": lambda m: m.schedule.get_manager_reputation(),
+             "Manager strategy": lambda m: m.schedule.get_manager_strategy()})
         self.running = True
 
         # Initialization functions

@@ -40,7 +40,7 @@ def run_FIFA_model():
     unforgiving_money = []
     simple_money = []
 
-    for i in range(10):
+    for i in range(1):
         print('Run ' + str(i + 1))
         model = FIFA_Simulation(player_stats=player_stats, verbose=False)
         model.run_model()
@@ -72,10 +72,11 @@ def run_FIFA_model():
         unforgiving_money.append(unforg_money)
         simple_money.append(sim_money)
 
-    plot(evenstrat, unforgiving, simple, evenstrat_money, unforgiving_money, simple_money)
     data = model.datacollector.get_model_vars_dataframe()
 
     print(data)
+    plot(evenstrat, unforgiving, simple, evenstrat_money, unforgiving_money, simple_money)
+
 
 def plot(tactic1, tactic2, tactic3, money1, money2, money3):
     x = list(range(1, 11))

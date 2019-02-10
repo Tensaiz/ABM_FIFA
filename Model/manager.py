@@ -110,6 +110,7 @@ class Manager(Agent):
         # Keep track of past match results
         self.game_history = []
 
+
     def assemble_step(self):
         if self.model.verbose:
             print('Manager ' + str(self.name) + ' has ' + str(self.assets) + ' funds available to pick players')

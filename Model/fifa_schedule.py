@@ -118,6 +118,7 @@ class RandomActivationFIFA(RandomActivation):
         manager_assets = {}
 
         for m in self.managers:
+
             manager_assets[m.name] = m.assets
 
         return manager_assets
@@ -128,3 +129,11 @@ class RandomActivationFIFA(RandomActivation):
         for m in self.managers:
             manager_rep[m.name] = m.reputation
         return manager_rep
+
+    def get_manager_strategy(self):
+        manager_strategy = {}
+
+        for m in self.managers:
+            manager_strategy[m.name] = type(m.strategy).__name__
+        return manager_strategy
+
